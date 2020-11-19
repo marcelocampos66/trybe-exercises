@@ -1,0 +1,39 @@
+#title {
+    font-size: 65px;
+    color: orange;
+    font-family: sans-serif;
+    font-style: italic;
+}
+
+ul {
+    background-color: yellow;
+    text-decoration: underline;
+    font-size: 30px;
+}
+
+.twice {
+    background-color: wheat;
+}
+
+p {
+    font-weight: 600;
+    font-size: 3em;
+}
+
+body {
+    font-size: 16px;
+    line-height: 50px;
+    text-align: center;
+}
+
+#amarelo {
+    background-color: yellow;
+}
+
+#vermelho {
+    background-color: red;
+}
+
+#marrom {
+    background-color: brown;
+}
