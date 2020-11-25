@@ -1,4 +1,4 @@
-let nota =;
+let nota = 92;
 
 if (nota >= 90) {
     console.log('A');
