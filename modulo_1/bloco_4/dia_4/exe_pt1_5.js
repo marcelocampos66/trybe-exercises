@@ -13,9 +13,9 @@ let info2 = {
 };
 
 for (let propriedades in info) {
-    if (info[propriedades] === info.recorrente && info[propriedades] === 'Sim' && info2[propriedades] === 'Sim') {
-        console.log("Ambos recorrentes");
-    } else {
-        console.log(info[propriedades] + 'e' + info2[propriedades]);
+    if(info[propriedades] == 'Sim') {
+        console.log('Ambos recorrentes')
     }
+    
+    //console.log(info[propriedades] + 'e' + info2[propriedades]);
 }
