@@ -6,6 +6,9 @@ let info = {
 
 info.recorrente = 'Sim';
 
-for (let propriedades in info) {
-    console.log(info[propriedades]);
+for (let key in info) {
+    console.log(info[key]);
 }
+
+// Se o for/in incrementa pela CHAVE
+//o for/off incrementa pelo VALOR (SO FUNCIONA COM ARRAY)
