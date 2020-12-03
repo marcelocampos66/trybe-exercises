@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Exercício 5.2</title>
+    <style>
+      div {
+        border-color: black;
+        border-style: solid;
+      }
+
+      .title {
+        text-align: center;
+      }
+
+      .main-content {
+        background-color: yellow;
+      }
+
+      .main-content .center-content {
+        background-color: red;
+        width: 50%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .main-content .center-content p {
+        font-style: italic;
+      }
+
+      .main-content .left-content {
+        background-color: green;
+        width: 60%;
+        margin-left: 0;
+        margin-right: auto;
+      }
+
+      .main-content .left-content .small-image {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 100%;
+      }
+
+      .main-content .right-content {
+        background-color: blue;
+        width: 60%;
+        margin-left: auto;
+        margin-right: 0;
+      }
+
+      .main-content .description {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      
+      //Exercicio1
+      let tagH1ComTexto = document.createElement('h1');
+      tagH1ComTexto.innerText = 'Exercício 5.2 - JavaScript DOM';
+      document.body.appendChild(tagH1ComTexto);
+      //
+
+      //Exercicio2
+      let tagDivMain = document.createElement('div');
+      tagDivMain.className = 'main-content';
+      document.body.appendChild(tagDivMain);
+      //
+
+      //Exercicio3
+      let tagDivCenter = document.createElement('div');
+      tagDivCenter.className = 'center-content';
+      tagDivMain.appendChild(tagDivCenter);
+      //
+
+      //Exercicio4
+      let motivacionalText = document.createElement('p');
+      motivacionalText.innerText = "Talvez você esteja preocupado(a) demais,desanimado com essa ou aquela situação. Vivendo sob grande tensão. Sem saber por onde ir ou como fazer. Pois vou lhe dar alguns motivos para melhorar.mesmo sem grandes recursos financeiros,mesmo sem médico, sem antUla e sem dor."      
+      tagDivCenter.appendChild(motivacionalText);
+      //
+      
+      //Exercicio5
+      let tagDivLeft = document.createElement('div');
+      tagDivLeft.className = 'left-content';
+      tagDivMain.appendChild(tagDivLeft);
+      //
+
+      //Exercicio6
+      let tagDivRight = document.createElement('div');
+      tagDivRight.className = 'right-content';
+      tagDivMain.appendChild(tagDivRight);
+      //
+
+      //Exercicio7
+      let putImgOnSite = document.createElement('img');
+      putImgOnSite.className = 'small-image';
+      putImgOnSite.src = 'https://picsum.photos/200';
+      tagDivLeft.appendChild(putImgOnSite);
+      //
+
+      //Exercicio8
+      let putUlOnSite = document.createElement('ul');
+      tagDivRight.appendChild(putUlOnSite);
+      let liArray = ['Um', 'Dois', 'Três', 'Quatro', 'Cinco', 'Seis', 'Sete', 'Oito', 'Nove', 'Dez'];
+      for (let index = 0; index < liArray.length; index += 1){
+        let putIlOnSite = document.createElement('li');
+        putIlOnSite.innerText = liArray[index];
+        putUlOnSite.appendChild(putIlOnSite);
+      }
+      //
+
+      //Exercicio9
+      for (let index = 1; index <= 3 ; index += 1) {
+        let tagH3 = document.createElement('h3');
+        tagH3.innerText = 'Conteudo';
+        tagDivMain.appendChild(tagH3);
+      }
+      //
+
+      //PARTE 2
+
+      //Exercicio 1
+      tagH1ComTexto.className = 'title';
+      //
+
+      //Exercicio 2
+      let description = document.getElementsByTagName('h3');
+      for(let index = 0; index < description.length; index += 1) {
+        description[index].className = 'description';
+      }
+      //
+
+      //Exercicio 3
+      let removeLeft = document.getElementsByClassName('left-content')[0];
+      tagDivMain.removeChild(removeLeft);
+      //
+
+      //Exercicio 4
+      let centerRight = document.querySelector('.right-content');
+      centerRight.style.marginRight = 'auto';
+      //
+
+      //Exercicio 5
+      let mudarCorCentro = document.getElementsByClassName('center-content')[0];
+      mudarCorCentro.parentNode.style.backgroundColor = 'green';
+      //
+
+      //Exercicio 6
+      putUlOnSite.lastChild.remove();
+      putUlOnSite.lastChild.remove();
+
+
+    </script>
+  </body>
+</html>
