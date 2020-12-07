@@ -149,9 +149,15 @@
       //
 
       //Exercicio 6
-      putUlOnSite.lastChild.remove();
-      putUlOnSite.lastChild.remove();
-
+      //putUlOnSite.lastChild.remove();
+      //putUlOnSite.lastChild.remove();
+      //
+      let liList = document.getElementsByTagName('li');
+      for (let index = 0; index <= liList.length; index += 1) {
+        if (liList[index] === liList[liList.length - 1]) {
+          liList -= liList[liList.length - 1]
+        }
+      }
 
     </script>
   </body>
