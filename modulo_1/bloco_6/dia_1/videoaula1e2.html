@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Titulo</title>
+</head>
+<body>
+  <form action="" method="GET">
+    <label for="input-text">Digite seu nome</label>
+    <input type="text" placeholder="digite alguma coisa" required class="" value="1# -" name="texto" id="input-text">
+    <br>
+    <textarea name="" id="" cols="30" rows="5">texto inicial</textarea>
+    <button type="submit">Enviar</button>
+  </form>
+  <br>
+  <br>
+  <form action="" method="GET">
+    <input type="checkbox" id="esporte-1" value="fut" name="esporte" checked>Futebol
+    <input type="checkbox" id="esporte-2" value="vol" name="esporte" checked>Volei
+    <input type="checkbox" id="esporte-3" value="pet" name="esporte" checked>Peteca
+    <input type="checkbox" id="esporte-4" value="bas" name="esporte" checked>Basquete
+    <br>
+    <br>
+    <label for="hub1"><input type="radio" id="hub1" name="hub" value="sp">Sao Paulo</label>
+    <label for="hub2"><input type="radio" id="hub2" name="hub" value="bh">Belo Horizonte</label>
+    <label for="hub3"><input type="radio" id="hub3" name="hub" value="fl">Florianopolis</label>
+    <label for="hub4"><input type="radio" id="hub4" name="hub" value="mc">Macedonia</label>
+    <--se os names forem diferentes entao consigo selecionar mais de um(mesmo contexto)-->
+    <--colocar em labels facilita para a usabilidade e eh uma boa pratica-->
+  </form>
+  <br>
+  <br>
+  <form action="" method="GET">
+    <select name="estado" id="dropdown-estado">
+      <option value="sp">Sao Paulo</option>
+      <option value="mg">Minas Gerais</option>
+      <option value="ba">Bahia</option>
+      <option value="rj">Rio de Janeiro</option>
+    </select>
+  </form>
+  <br>
+  <br>
+  <form action="" method="GET">
+    <input type="password" name="senha">
+  </form>
+  <br>
+  <br>
+  <form action="" method="GET">
+    <input type="file" name="" id="">
+    <--Se o method for POST entao devemos usar mais uma propriedade (enctype="multipart/form-data")-->
+  </form>
+  <br>
+  <br>
+  <form action="" method="GET">
+    <p>USUARIO</p>
+    <input type="text" name="user" required>
+    <p>SENHA</p>
+    <input type="password" name="senha" required>
+    <button type="submit">Enviar</button>
+  </form>
+</body>
+</html>
