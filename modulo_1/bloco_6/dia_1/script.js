@@ -18,9 +18,24 @@ function saveForm(event) {
   event.preventDefault();
   const formInputs = document.querySelectorAll('input');
   for (let index = 0; index < formInputs.length; index += 1) {
+    const getDivData = document.querySelector('#consolided-data');
+    const newDiv = document.createElement('div');
+    newDiv.className = 'data';
+    getDivData.appendChild(newDiv);
     newDiv.innerHTML = formInputs[index].value;
   }
 }
 
 const submitButton = document.querySelector('#submit-button');
 submitButton.addEventListener('click', saveForm);
+
+function clearAllFields() {
+  const dataForms = document.querySelector('#consolided-data');
+  const getData = document.querySelectorAll('.data');
+  for (let index = 0; index < getData.length; index += 1) {
+    dataForms.lastChild.remove();
+  }
+}
+
+const clearButton = document.querySelector('#clear-button');
+clearButton.addEventListener('click', clearAllFields)
