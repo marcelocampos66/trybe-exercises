@@ -14,34 +14,34 @@
         <legend>Dados Pessoais</legend>
         <div class="line-content">
           <label for="full-name">Nome Completo</label>
-          <input type="text" name="full-name" id="full-name" maxlength="40" required>
+          <input type="text" name="full-name" class="form-item" id="full-name" maxlength="40" required>
         </div>
         <div class="line-content">
           <label for="input-email">E-mail</label>
-          <input type="email" name="email" id="input-email"
+          <input type="email" name="email" class="form-item" id="input-email"
           maxlength="50" required>
         </div>
         <div class="line-content">
           <label for="input-cpf">CPF</label>
-          <input type="text" name="cpf" id="input-cpf" maxlength="11" required>
+          <input type="text" name="cpf" class="form-item" id="input-cpf" maxlength="11" required>
         </div>
         <div class="line-content">
           <label for="input-endereco">Endereço</label>
-          <input type="text" name="endereco" id="input-endereco" maxlength="200" required>
+          <input type="text" name="endereco" class="form-item" id="input-endereco" maxlength="200" required>
         </div>
         <div class="line-content">
           <label for="input-cidade">Cidade</label>
-          <input type="text" name="cidade" id="input-cidade" maxlength="28" required>
+          <input type="text" name="cidade" class="form-item" id="input-cidade" maxlength="28" required>
         </div>
         <div class="line-content">
           <label for="input-estado">Estado</label>
-          <select name="estado" id="input-estado" required></select>
+          <select name="estado" id="input-estado" class="form-item" required></select>
         </div>
         <div class="line-content">
           <label for="casa">Casa</label>
-          <input type="radio" name="tipo-residencial" id="casa" value="casa">
+          <input type="radio" name="tipo-residencial" class="form-item resid" id="casa" value="casa">
           <label for="apart">Apartamento</label>
-          <input type="radio" name="tipo-residencial" id="apart" value="apartamento">
+          <input type="radio" name="tipo-residencial" class="form-item resid" id="apart" value="apartamento">
         </div>
       </fieldset>
       <br>
@@ -49,19 +49,19 @@
         <legend>Currículo</legend>
         <div class="line-content">
           <span>Resumo do currículo</span><br>
-          <textarea name="resumo-curriculo" id="resumo-curriculo" cols="30" rows="10" maxlength="1000" required></textarea>
+          <textarea name="resumo-curriculo" class="form-item" id="resumo-curriculo" cols="30" rows="10" maxlength="1000" required></textarea>
         </div>
         <div class="line-content">
           <label for="input-cargo">Cargo</label>
-          <input type="text" name="cargo" id="input-cargo" maxlength="40" required>
+          <input type="text" name="cargo" class="form-item" id="input-cargo" maxlength="40" required>
         </div>
         <div class="line-content">
           <label for="input-descricao">Descrição do cargo</label>
-          <input type="text" name="descricao-cargo" id="input-descricao" maxlength="500" required>
+          <input type="text" name="descricao-cargo" class="form-item" id="input-descricao" maxlength="500" required>
         </div>
         <div class="line-content">
           <label for="data-inicio">Data de início</label>
-          <input type="date" min='1899-01-01' max='2050-01-01' name="data-inicio" id="data-inicio" required>
+          <input type="date" min='1899-01-01' max='2050-01-01' name="data-inicio" class="form-item" id="data-inicio" required>
         </div>
       </fieldset>
       <div class="buttons-container">

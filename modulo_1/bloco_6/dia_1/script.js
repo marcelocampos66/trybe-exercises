@@ -16,7 +16,7 @@ function createStateOptions() {
 
 function saveForm(event) {
   event.preventDefault();
-  const formInputs = document.querySelectorAll('input');
+  const formInputs = document.querySelectorAll('.form-item');
   for (let index = 0; index < formInputs.length; index += 1) {
     const getDivData = document.querySelector('#consolided-data');
     const newDiv = document.createElement('div');
