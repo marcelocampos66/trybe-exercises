@@ -18,7 +18,7 @@ function saveForm(event) {
   event.preventDefault();
   const formInputs = document.querySelectorAll('.form-item');
   for (let index = 0; index < formInputs.length; index += 1) {
-    if (formInputs[index].type === 'radio' && formInputs[index].checked) {
+    if (formInputs[index].type === 'radio' && !formInputs[index].checked) {
       continue;
     }
     const getDivData = document.querySelector('#consolided-data');

@@ -16,11 +16,11 @@
       <div class="control">
         <div class="field">
           <label class="label" for="full-name">Nome Completo</label>
-          <input type="text" name="full-name" class="input form-item" id="full-name" maxlength="40" required>
+          <input type="text" data-validate-field="name" name="full-name" class="input form-item" id="full-name" maxlength="40" required>
         </div>
         <div class="field">
           <label class="label" for="input-email">E-mail</label>
-          <input type="email" name="email" class="input form-item" id="input-email"
+          <input type="email" data-validate-field="email" name="email" class="input form-item" id="input-email"
           maxlength="50" required>
         </div>
         <div class="field">
@@ -33,7 +33,7 @@
         </div>
         <div class="field">
           <label class="label" for="input-cidade">Cidade</label>
-          <input type="text" name="cidade" class="input form-item" id="input-cidade" maxlength="28" required>
+          <input type="text" data-validate-field="text" name="cidade" class="input form-item" id="input-cidade" maxlength="28" required>
         </div>
         <div class="field">
           <label class="label" for="input-estado">Estado</label>
@@ -73,7 +73,8 @@
   <script src="script.js"></script>
   <script src="pikaday.js"></script>
   <script>
-    var picker = new Pikaday({ field: document.getElementById('datepicker') });
+    let picker = new Pikaday({ field: document.getElementById('datepicker') });
   </script>
+  <script src="dist/js/just-validate.js"></script>
 </body>
 </html>
