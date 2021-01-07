@@ -25,6 +25,7 @@ body {
   height: 50px;
   order: 1;
   flex-grow: 1;
+  align-self: center;
 }
 
 .menu-container ul {
@@ -42,6 +43,11 @@ body {
   margin-right: 10px;
 }
 
+.menu-container li:nth-child(2) {
+  order: 1;
+  color: lightgreen;
+}
+
 /* PARTE 2 */
 
 .main-container {
@@ -54,11 +60,13 @@ body {
   flex-direction: column;
   flex-basis: 700px;
   flex-grow: 10;
+  background-color: black;
 }
 
 .movie-container h2 {
   margin: 40px 0;
   text-align: center;
+  color: white;
 }
 
 .card-container {
@@ -82,8 +90,11 @@ body {
 .aside-container {
   display: flex;
   flex-direction: column;
-  margin: 20px;
+  margin: 0px;
+  padding: 10px 20px;
   flex-basis: 400px;
+  justify-content: center;
+  background-color: lightgray;
 }
 
 .aside-container h3, h4 {
