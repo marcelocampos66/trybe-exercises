@@ -42,3 +42,25 @@ function clearAllFields() {
 
 const clearButton = document.querySelector('#clear-button');
 clearButton.addEventListener('click', clearAllFields)
+
+// JUST VALIDATE
+
+const validation = new JustValidate('.js-form', {
+  rules: {
+    name: {
+      required: true,
+      minLength: 3,
+      maxLength: 40,
+    },
+  },
+  messages: {
+    name: {
+      required: 'O preenchimento desse campo eh obrigatorio',
+      minLength: 'O tamanho minimo desse campo eh de 3 caracteres',
+      maxLength: 'O limite desse campo eh de 40 caracteres',
+    }
+  },
+  submitHandler : function (form, values) {
+    console.log(form, values);
+  }
+});

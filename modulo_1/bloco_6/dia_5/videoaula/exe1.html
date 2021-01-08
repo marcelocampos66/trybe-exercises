@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .container {
+      display: flex;
+      justify-content: space-between;
+      margin: 50px;
+      padding: 50px;
+      border: 2px solid black;
+    }
+
+    .box {
+      font-size: 50px;
+      padding: 50px;
+      border: 8px solid black;
+      background: yellow;
+      width: 40%;
+    }
+
+    @media screen and (max-width: 1100px) and (min-width: 900px) {
+      .box {
+        font-size: 50px;
+        padding: 50px;
+        border: 8px solid black;
+        background: blue;
+      }
+    }
+
+    @media screen and (max-width: 899px) and (min-width: 601px) {
+      .container {
+        justify-content: center;
+      }
+
+      .box {
+        font-size: 50px;
+        padding: 50px;
+        border: 8px solid black;
+        background: green;
+      }
+
+      .second {
+        display: none;
+        /* visibility: hidden; NAO APARECE o conteudo porem continua ocupando o espaco */
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .box {
+        font-size: 50px;
+        padding: 50px;
+        border: 8px solid black;
+        background: red;
+      }
+    }
+
+  </style>
+  <title>Media Query Tests</title>
+</head>
+<body>
+  <section class="container">
+    <div class="box"></div>
+    <div class="box second"></div>
+  </section>
+</body>
+</html>
