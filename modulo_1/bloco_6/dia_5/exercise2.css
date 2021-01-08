@@ -1,0 +1,130 @@
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: lightskyblue;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  text-align: center;
+  background-color: lightgrey;
+}
+
+header nav ul {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+}
+
+header nav ul li {
+  margin: 5px;
+  padding: 10px;
+  list-style-type: none;
+  border: 1px solid black;
+  background-color: black;
+  color: white;
+}
+
+.aside-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border: 3px solid black;
+  justify-content: space-evenly;
+}
+
+.aside-one h2 {
+  text-align: center;
+}
+
+.aside-one ul li {
+  list-style-type: none;
+}
+
+.aside-two h2 {
+  text-align: center;
+}
+
+.aside-two ul li {
+  list-style-type: none;
+}
+
+.main-content h1 {
+  text-align: center;
+}
+
+footer {
+  border-top: 1px solid black;
+  background-color: lightgrey;
+}
+
+@media screen and (max-width: 735px) {
+  html {
+    background-color: lightgreen;
+  }
+
+  .aside-container {
+    display: block;
+    border: none;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+
+  .main-content {
+    margin: 5px 15px;
+  }
+
+  .main-content h1 {
+    font-size: 1.2rem;
+  }
+
+  footer {
+    font-size: small;
+    padding: 0 10px;
+  }
+}
+
+@media screen and (min-width: 736px) and (max-width: 1024px) {
+  html {
+    background-color: lightsalmon;
+    font-size: xx-large;
+  }
+
+  footer {
+    font-size: medium;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .main-content {
+    border: 3px solid black;
+    border-radius: 10%;
+    padding: 30px;
+    margin: 100px 200px;
+  }
+
+  header {
+    background-color: lightgrey;
+  }
+
+  .aside-one ul {
+    margin: 50px;
+  }
+
+  .aside-two ul {
+    margin: 50px;
+  }
+
+  footer {
+    font-size: 1rem;
+    padding: 0 50px;
+  }
+}
