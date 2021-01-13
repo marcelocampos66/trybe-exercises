@@ -15,8 +15,8 @@ const student2 = {
 
 const listSkills = (student) => {
   const arrayOfSkills = Object.keys(student);
-  for(i in arrayOfSkills){
-    console.log(`${arrayOfSkills[i]}, Nível: ${student[arrayOfSkills[i]]}`);
+  for(index in arrayOfSkills){
+    console.log(`${arrayOfSkills[index]}, Nível: ${student[arrayOfSkills[index]]}`);
   }
 };
 
@@ -26,6 +26,7 @@ listSkills(student1);
 console.log('Estudante 2');
 listSkills(student2);
 
-const arrayOfSkills = Object.keys(student1);
-console.log(arrayOfSkills);
-console.log(student1.values);
+// const arrayOfSkills = Object.keys(student1);
+// console.log(arrayOfSkills);
+// console.log(Object.values(student1));
+// console.log();
