@@ -10,23 +10,19 @@ const funcao1 = (string) => {
 // console.log(funcao1('Marcelo'))
 
 //
-// for (let index = 0; index < array.length; index +=1) {}
-
-array.forEach(function(nome, index) {
-  let result = (nome, index);
+let resultados = '';
+array.forEach(function (nome, index) {
+  resultados += `-${nome} \n`;
+  // console.log(resultados);
 })
 
 //
 
 const funcao2 = (stringRetornada) => {
 
-
   return `${stringRetornada} Minhas cinco principais habilidades são:
-  -${array[0]}
-  -${array[1]}
-  -${array[2]}
-  -${array[3]}
-  -${array[4]}
+
+${resultados}
 
   #goTrybe!`
 }
