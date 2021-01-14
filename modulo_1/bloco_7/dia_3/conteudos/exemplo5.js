@@ -13,3 +13,8 @@ assert.deepStrictEqual(person1, person2, 'Erro: person1 e person2 não são estr
 const person3 = { name: 'john', age: 19 };
 
 assert.notDeepStrictEqual(person1, person3, 'Erro: os valores dos objetos são estritamente iguais');
+
+
+assert.throws(() =>{
+  // o que tiver dentro dessa function, TEM que lancar uma excecao,
+}, segundoParametro);
