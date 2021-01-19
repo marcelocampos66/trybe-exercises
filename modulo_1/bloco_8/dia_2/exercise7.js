@@ -63,14 +63,13 @@ const books = [
   },
 ];
 
-const expectedResult = false;
+const expectedResult = 'O Senhor dos Anéis';
 
-function authorUnique() {
-  return books.every((item) => {
-    return !books.some((element) => (element.author.birthYear === item.author.birthYear) && (element.author.name !== item.author.name));
-  })
+function authorWith3DotsOnName() {
+  const bookObject = books.find((book) => book.author.name.substr(1, 1) === '.' && book.author.name.substr(4, 1) === '.' && book.author.name.substr(7, 1) === '.').name;
+
+  return bookObject;
 }
+console.log(authorWith3DotsOnName());
 
-console.log(authorUnique());
-
-assert.strictEqual(authorUnique(), expectedResult);
+assert.deepStrictEqual(authorWith3DotsOnName(), expectedResult);

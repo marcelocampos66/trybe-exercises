@@ -63,14 +63,17 @@ const books = [
   },
 ];
 
-const expectedResult = false;
+const expectedResult = [
+  'Frank Herbert',
+  'George R. R. Martin',
+  'Isaac Asimov',
+  'J. R. R. Tolkien'
+]
 
-function authorUnique() {
-  return books.every((item) => {
-    return !books.some((element) => (element.author.birthYear === item.author.birthYear) && (element.author.name !== item.author.name));
-  })
+function fantasyOrScienceFictionAuthors() {
+  const authors = books.filter((book) => book.genre === 'Ficção Científica' || book.genre === 'Fantasia').map((book) => book.author.name).sort();
+  return authors;
 }
+console.log(fantasyOrScienceFictionAuthors());
 
-console.log(authorUnique());
-
-assert.strictEqual(authorUnique(), expectedResult);
+// assert.deepStrictEqual(fantasyOrScienceFictionAuthors(), expectedResult);

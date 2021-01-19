@@ -63,14 +63,41 @@ const books = [
   },
 ];
 
-const expectedResult = false;
+const expectedResult = [
+  {
+    age: 31,
+    author: 'Isaac Asimov'
+  },
+  {
+    age: 38,
+    author: 'H. P. Lovecraft'
+  },
+  {
+    age: 39,
+    author: 'Stephen King'
+  },
+  {
+    age: 43,
+    author: 'George R. R. Martin'
+  },
+  {
+    age: 45,
+    author: 'Frank Herbert'
+  },
+  {
+    age: 62,
+    author: 'J. R. R. Tolkien'
+  }
+];
 
-function authorUnique() {
-  return books.every((item) => {
-    return !books.some((element) => (element.author.birthYear === item.author.birthYear) && (element.author.name !== item.author.name));
-  })
+function nameAndAge() {
+  const newArray = books.map((book) => (
+    {
+      author: book.author.name,
+      age: book.releaseYear - book.author.birthYear,
+    }
+  )).sort((item1, item2) => item1.age - item2.age);
+  return newArray;
 }
 
-console.log(authorUnique());
-
-assert.strictEqual(authorUnique(), expectedResult);
+assert.deepStrictEqual(nameAndAge(), expectedResult);

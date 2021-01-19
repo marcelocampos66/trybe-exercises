@@ -63,14 +63,18 @@ const books = [
   },
 ];
 
-const expectedResult = false;
+const expectedResult = [
+  'As Crônicas de Gelo e Fogo - Fantasia - George R. R. Martin',
+  'O Senhor dos Anéis - Fantasia - J. R. R. Tolkien',
+  'Fundação - Ficção Científica - Isaac Asimov',
+  'Duna - Ficção Científica - Frank Herbert',
+  'A Coisa - Terror - Stephen King',
+  'O Chamado de Cthulhu - Terror - H. P. Lovecraft'
+];
 
-function authorUnique() {
-  return books.every((item) => {
-    return !books.some((element) => (element.author.birthYear === item.author.birthYear) && (element.author.name !== item.author.name));
-  })
+function formatedBookNames() {
+  return books.map((book) => `${book.name} - ${book.genre} - ${book.author.name}`);
 }
+console.log(formatedBookNames());
 
-console.log(authorUnique());
-
-assert.strictEqual(authorUnique(), expectedResult);
+assert.deepStrictEqual(formatedBookNames(), expectedResult);
