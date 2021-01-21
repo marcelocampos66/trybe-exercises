@@ -17,3 +17,4 @@ const { nationality = 'Brazilian' } = person;
 
 console.log(phrase(otherPerson)); // Ivan is Russian
 console.log(phrase(person));
+// console.log(teste);
