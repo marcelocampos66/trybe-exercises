@@ -30,7 +30,8 @@ const people = [
 
 // escreva filterPeople abaixo
 function filterPeople(people) {
-  return people.filter(({ bornIn, nationality }) => bornIn < 2001 && nationality === 'Australian')
+  const result = people.filter(({ bornIn, nationality }) => bornIn < 2001 && nationality === 'Australian')
+  return result;
 }
 
 
