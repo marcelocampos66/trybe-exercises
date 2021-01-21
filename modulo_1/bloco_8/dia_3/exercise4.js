@@ -34,7 +34,6 @@ const books = [
   {
     id: 4,
     name: 'Duna',
-    genre: 'Ficção Científica',
     author: {
       name: 'Frank Herbert',
       birthYear: 1920,
@@ -63,13 +62,21 @@ const books = [
   },
 ];
 
-const expectedResult = 'O Senhor dos Anéis';
+const expectedResult = {
+  author: {
+    birthYear: 1948,
+    name: 'George R. R. Martin'
+  },
+  genre: 'Fantasia',
+  id: 1,
+  name: 'As Crônicas de Gelo e Fogo',
+  releaseYear: 1991
+};
 
-function authorWith3DotsOnName() {
-  const bookObject = books.find((book) => book.author.name.split(' ').filter((string) => string.endsWith('.')).length === 3).name;
-
-  return bookObject;
+function longestNamedBook() {
+  const bookNames = books.reduce((book1, book2) => (book1.name.length > book2.name.length) ? book1 : book2);
+  return bookNames;
 }
-console.log(authorWith3DotsOnName());
+console.log(longestNamedBook());
 
-// assert.deepStrictEqual(authorWith3DotsOnName(), expectedResult);
+assert.deepStrictEqual(longestNamedBook(), expectedResult);

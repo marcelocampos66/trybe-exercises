@@ -63,13 +63,15 @@ const books = [
   },
 ];
 
-const expectedResult = 'O Senhor dos Anéis';
+const expectedResult = 43;
 
-function authorWith3DotsOnName() {
-  const bookObject = books.find((book) => book.author.name.split(' ').filter((string) => string.endsWith('.')).length === 3).name;
-
-  return bookObject;
+function averageAge() {
+  const objectSize = books.length;
+  const arrayAge =
+  books.map((book) => book.releaseYear - book.author.birthYear)
+  .reduce((acc, age) => acc + age) / objectSize;
+  return arrayAge;
 }
-console.log(authorWith3DotsOnName());
+console.log(averageAge());
 
-// assert.deepStrictEqual(authorWith3DotsOnName(), expectedResult);
+assert.strictEqual(averageAge(), expectedResult);

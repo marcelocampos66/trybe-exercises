@@ -1,3 +1,4 @@
+
 const assert = require('assert');
 
 const books = [
@@ -63,13 +64,17 @@ const books = [
   },
 ];
 
-const expectedResult = 'O Senhor dos Anéis';
+// function allNames() {
+//   const result = books.reduce((acc, book, index, array) => (index === array.length - 1) ? `${acc} ${book.author.name}.` : `${acc} ${book.author.name},`,'Nomes:');
+//   return result;
+// }
 
-function authorWith3DotsOnName() {
-  const bookObject = books.find((book) => book.author.name.split(' ').filter((string) => string.endsWith('.')).length === 3).name;
-
-  return bookObject;
+function allNames() {
+  let result = books.reduce((acc, book) => `${acc} ${book.author.name},`,'Nomes:');
+  result = result.replace(/.$/,".");
+  return result;
 }
-console.log(authorWith3DotsOnName());
 
-// assert.deepStrictEqual(authorWith3DotsOnName(), expectedResult);
+console.log(allNames());
+
+assert.deepStrictEqual(allNames(), "Nomes: George R. R. Martin, J. R. R. Tolkien, Isaac Asimov, Frank Herbert, Stephen King, H. P. Lovecraft.");
