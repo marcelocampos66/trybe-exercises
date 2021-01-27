@@ -21,8 +21,8 @@ function chanceOfGettingTemperature() {
 // definição da função sendMarsTemperature...
 function sendMarsTemperature(fahrenheitConverter, dealWithError) {
   const temperature = getMarsTemperature();
-  return setTimeout(() => {
-    return (chanceOfGettingTemperature() > 60) ? dealWithError(errorMessage) : fahrenheitConverter(temperature);
+  setTimeout(() => {
+    (chanceOfGettingTemperature() > 60) ? dealWithError(errorMessage) : fahrenheitConverter(temperature);
   }, messageDelay());
 }
 
