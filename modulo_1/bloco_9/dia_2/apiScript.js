@@ -9,8 +9,8 @@ const myObject = {
 };
 
 const fetchJoke = () => {
-  fetch(API_URL, myObject)
-  .then(response => response.json())
+  const promise = fetch(API_URL, myObject);
+  promise.then(response => response.json())
   .then(data => document.getElementById('jokeContainer').innerText = data.joke)
 };
 
