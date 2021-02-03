@@ -1,0 +1,200 @@
+toBe
+Esse matcher testa igualdade estrita entre o valor passado para expect e seu argumento. Isso significa, por exemplo, que um teste com o expectation abaixo falharia porque a string "5" não é igual ao número 5.
+
+Ex: expect(5).toBe("5")
+
+/////
+
+toEqual
+Para testar igualdade de objetos e arrays, é preciso usar o matcher toEqual , que acessa cada elemento do objeto ou array, fazendo um trabalho de comparação específico e que retorna uma resposta mais voltada para a necessidade dos testes:
+
+test('array and object equality', () => {
+  const arr = [1, 2 ,3];
+  const obj = { a: 1, b: 2, c: 3};
+
+  expect(arr).toBe([1, 2, 3]); // fails
+  expect(obj).toBe({ a: 1, b: 2, c: 3}); // fails
+  expect(arr).toEqual([1, 2, 3]); // OK
+  expect(obj).toEqual({ a: 1, b: 2, c: 3}); // OK
+});
+
+/////
+
+Valores booleanos
+null , undefined e false são valores falsy . Isso significa que são tratados como false sempre que se espera um valor booleano, como em condicionais. Às vezes, porém, é preciso distinguir entre eles. Ex:
+
+toBeNull corresponde a apenas null
+toBeUndefined corresponde a apenas undefined
+toBeDefined é o oposto de toBeUndefined
+toBeTruthy combina com qualquer coisa que uma instrução if trata como verdadeiro
+toBeFalsy combina com qualquer coisa que uma instrução if trata como falso
+
+/////
+
+Números
+Há matchers para as principais formas de comparar números. Ex:
+
+test('dois mais dois', () => {
+  const value = 2 + 2;
+  expect(value).toBeGreaterThan(3);
+  expect(value).toBeGreaterThanOrEqual(3.5);
+  expect(value).toBeLessThan(5);
+  expect(value).toBeLessThanOrEqual(4.5);
+
+  // toBe e toEqual são equivalentes para números
+  expect(value).toBe(4);
+  expect(value).toEqual(4);
+});
+
+Para igualdade de ponto flutuante, use toBeCloseTo em vez de toEqual, porque você não quer um teste dependa de um pequeno erro de arredondamento. Ex:
+
+test('adicionando números de ponto flutuante', () => {
+  const value = 0.1 + 0.2;
+  //expect(value).toBe(0.3);     Isso não vai funcionar por causa de um erro de arredondamento
+  expect(value).toBeCloseTo(0.3); // Isso funciona.
+});
+
+/////
+
+Strings
+Para comparar string com expressões regulares, utilize o matcher toMatch . Ex:
+
+test('não existe I em team', () => {
+  expect('team').not.toMatch(/I/);
+});
+
+test('mas existe "stop" em Christoph', () => {
+  expect('Christoph').toMatch(/stop/);
+});
+
+/////
+
+Arrays
+Você pode verificar se um array contém um item em particular utilizando toContain . Para verificar que um item possui uma estrutura mais complexa, utilize toContainEqual . toHaveLength permite facilmente verificar o tamanho de um array ou de uma string. Ex:
+
+const shoppingList = [
+  'diapers',
+  'kleenex',
+  'trash bags',
+  'paper towels',
+  'milk',
+];
+
+test('the shopping list has milk on it', () => {
+  expect(shoppingList).toContain('milk');
+  expect(new Set(shoppingList)).toContain('milk');
+});
+
+/////
+
+Objetos
+É bastante comum testar se um objeto possui uma propriedade específica. O matcher toHaveProperty é ideal para esses casos. Ex:
+
+// Object containing house features to be tested
+const houseForSale = {
+  bath: true,
+  bedrooms: 4,
+  kitchen: {
+    amenities: ['oven', 'stove', 'washer'],
+    area: 20,
+    wallColor: 'white',
+    'nice.oven': true,
+  },
+  'ceiling.height': 2,
+};
+
+test('this house has my desired features', () => {
+  // Example Referencing
+  expect(houseForSale).toHaveProperty('bath');
+  expect(houseForSale).toHaveProperty('bedrooms', 4);
+
+  expect(houseForSale).not.toHaveProperty('pool');
+
+  // Deep referencing using dot notation
+  expect(houseForSale).toHaveProperty('kitchen.area', 20);
+  expect(houseForSale).toHaveProperty('kitchen.amenities', [
+    'oven',
+    'stove',
+    'washer',
+  ]);
+
+  expect(houseForSale).not.toHaveProperty('kitchen.open');
+
+  // Deep referencing using an array containing the keyPath
+  expect(houseForSale).toHaveProperty(['kitchen', 'area'], 20);
+  expect(houseForSale).toHaveProperty(
+    ['kitchen', 'amenities'],
+    ['oven', 'stove', 'washer'],
+  );
+  expect(houseForSale).toHaveProperty(['kitchen', 'amenities', 0], 'oven');
+  expect(houseForSale).toHaveProperty(['kitchen', 'nice.oven']);
+  expect(houseForSale).not.toHaveProperty(['kitchen', 'open']);
+
+  // Referencing keys with dot in the key itself
+  expect(houseForSale).toHaveProperty(['ceiling.height'], 'tall');
+});
+
+/////
+
+Exceções
+toThrow testa se uma função lança um erro quando é executada. Para testar se uma função está retornando um erro, é importante estar atento à sintaxe do .toThrow :
+
+const multiplyByTwo = (number) => {
+  if (!number) {
+    throw new Error('number é indefinido')
+  }
+  return number * 2;
+};
+multiplyByTwo(4);
+
+test('testa se multiplyByTwo retorna o resultado da multiplicação', () => {
+  expect(multiplyByTwo(4)).toBe(8);
+});
+test('testa se é lançado um erro quando number é indefinido', () => {
+  expect(() => { multiplyByTwo() }).toThrow();
+});
+test('testa se a mensagem de erro é "number é indefinido"', () => {
+  expect(() => { multiplyByTwo() }).toThrowError(new Error('number é indefinido'));
+});
+
+Note que para testar se um erro é lançado, passamos para o expect uma função. Chamamos multiplyByTwo dentro da arrow function . Chamar a função diretamente dentro de expect fará com que o erro não seja capturado. Assim, a asserção falhará, porque o erro acontecerá antes mesmo de expect ser executado e ter a chance de capturar o erro. Para testar a mensagem de erro, como fizemos no terceiro teste do exemplo acima, usamos o matcher toThrowError e passamos dentro do parênteses a mensagem que será mostrada em caso de erro: new Error("number é indefinido") . Observe que nos dois casos a função que queremos testar é chamada indiretamente por uma arrow function . Seguir essa sintaxe é importante para que o seu teste funcione corretamente.
+
+/////
+
+not
+not permite testar o oposto de algo.
+Por exemplo, este código testa que domingo é um dia da semana, mas não um dia útil:
+
+const workDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const weekDays = ['Sunday', ...workDays, 'Saturday'];
+
+test('Sunday is a week day', () => {
+  expect(weekDays).toContain('Sunday');
+});
+
+test('Sunday is not a workday', () => {
+  expect(workDays).not.toContain('Sunday');
+});
+
+/////
+
+O bloco describe
+A função describe cria um bloco para agrupar vários testes. Isso é útil para melhorar a organização dos seus testes. Você pode utilizar describe , por exemplo, para separar testes de funções diferentes em um mesmo arquivo, ou para agrupar testes relacionados dentro de uma função complexa que requer muitos testes. É possível aninhar blocos describe arbitrariamente. Dentro de cada bloco, qualquer declaração de variáveis ou funções é local a este bloco.
+
+describe(name, fn)
+Por exemplo, se você tiver um objeto myBeverage que deve ser delicioso, mas não azedo, você pode testá-lo com:
+
+const myBeverage = {
+  delicious: true,
+  sour: false,
+};
+
+describe('my beverage', () => {
+  test('is delicious', () => {
+    expect(myBeverage.delicious).toBeTruthy();
+  });
+
+  test('is not sour', () => {
+    expect(myBeverage.sour).toBeFalsy();
+  });
+});
