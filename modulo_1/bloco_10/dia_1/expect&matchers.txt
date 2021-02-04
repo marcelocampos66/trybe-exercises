@@ -1,3 +1,5 @@
+Comando de install: npm install --save-dev jest
+
 toBe
 Esse matcher testa igualdade estrita entre o valor passado para expect e seu argumento. Isso significa, por exemplo, que um teste com o expectation abaixo falharia porque a string "5" não é igual ao número 5.
 
