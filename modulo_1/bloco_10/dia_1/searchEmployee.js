@@ -45,7 +45,7 @@ function searchEmployee(id, detail) {
   if (employee === undefined) {
     throw new Error("ID não identificada");
   }
-  if (!employee[detail]) {
+  if (employee[detail] === undefined) {
     throw new Error("Informação indisponível");
   }
 
