@@ -1,5 +1,6 @@
 const randomNumber = require('./genRandomNum');
-const tripleFunctions = require('./tripleFunctions');
+const { numberOne, numberTwo, numberThree } = require('./tripleFunctions');
+const fetchDog = require('./dogAPI');
 jest.mock('./genRandomNum');
 jest.mock('./tripleFunctions');
 
@@ -58,30 +59,30 @@ describe('Exercicio 3', () => {
 describe('Exercicio 4', () => {
 
   test('Faça uma nova implementação para a primeira função, mas agora ela deve retornar a string em caixa baixa', () => {
-    tripleFunctions.numberOne.mockImplementation((string) => string.toLowerCase());
+    const mockNumberOne = numberOne.mockImplementation((string) => string.toLowerCase());
     
-    expect(tripleFunctions.numberOne('XABLAU')).toStrictEqual('xablau');
-    expect(tripleFunctions.numberOne).toHaveBeenCalled();
-    expect(tripleFunctions.numberOne).toHaveBeenCalledTimes(1);
-    expect(tripleFunctions.numberOne).toHaveBeenCalledWith('XABLAU');
+    expect(mockNumberOne('XABLAU')).toStrictEqual('xablau');
+    expect(mockNumberOne).toHaveBeenCalled();
+    expect(mockNumberOne).toHaveBeenCalledTimes(1);
+    expect(mockNumberOne).toHaveBeenCalledWith('XABLAU');
   });
 
   test('Faça uma nova implementação deve retornar a última letra de uma string', () => {
-    tripleFunctions.numberTwo.mockImplementation((string) => string[string.length -1]);
+    const mockNumberTwo = numberTwo.mockImplementation((string) => string[string.length -1]);
     
-    expect(tripleFunctions.numberTwo('xablau')).toStrictEqual('u');
-    expect(tripleFunctions.numberTwo).toHaveBeenCalled();
-    expect(tripleFunctions.numberTwo).toHaveBeenCalledTimes(1);
-    expect(tripleFunctions.numberTwo).toHaveBeenCalledWith('xablau');
+    expect(mockNumberTwo('xablau')).toStrictEqual('u');
+    expect(mockNumberTwo).toHaveBeenCalled();
+    expect(mockNumberTwo).toHaveBeenCalledTimes(1);
+    expect(mockNumberTwo).toHaveBeenCalledWith('xablau');
   });
 
   test('A terceira deve receber três strings e concatená-las', () => {
-    tripleFunctions.numberThree.mockImplementation((string1, string2, string3) => string1.concat(string2, string3));
+    const mockNumberThree = numberThree.mockImplementation((string1, string2, string3) => string1.concat(string2, string3));
 
-    expect(tripleFunctions.numberThree('I', 'Love', 'Trybe')).toStrictEqual('ILoveTrybe');
-    expect(tripleFunctions.numberThree).toHaveBeenCalled();
-    expect(tripleFunctions.numberThree).toHaveBeenCalledTimes(1);
-    expect(tripleFunctions.numberThree).toHaveBeenCalledWith('I', 'Love', 'Trybe');
+    expect(mockNumberThree('I', 'Love', 'Trybe')).toStrictEqual('ILoveTrybe');
+    expect(mockNumberThree).toHaveBeenCalled();
+    expect(mockNumberThree).toHaveBeenCalledTimes(1);
+    expect(mockNumberThree).toHaveBeenCalledWith('I', 'Love', 'Trybe');
   });
 
 });
@@ -89,7 +90,7 @@ describe('Exercicio 4', () => {
 describe('Exercicio 5', () => {
 
   test('Utilizando as mesmas funções do exercício anterior, repita a implementação para a primeira função. Após repetir a implementação, restaure a implementação original e crie os testes necessários para validar', () => {
-    const one = jest.fn(tripleFunctions.numberOne);
+    const one = jest.fn(numberOne);
 
     one.mockImplementation((string) => string.toLowerCase());
 
@@ -98,12 +99,25 @@ describe('Exercicio 5', () => {
     expect(one).toHaveBeenCalledTimes(1);
     expect(one).toHaveBeenCalledWith('XABLAU');
 
-    // tripleFunctions.numberOne.mockRestore();
+    one.mockRestore();
 
-    // expect(tripleFunctions.numberOne('xablau')).toBe('XABLAU');
+    // expect(one('xablau')).toBe('XABLAU');
     // expect(one).toHaveBeenCalled();
-    // expect(one).toHaveBeenCalledTimes(3);
+    // expect(one).toHaveBeenCalledTimes(2);
     // expect(one).toHaveBeenCalledWith('xablau');
+  });
+
+});
+
+describe('Exercicio 6', () => {
+  const mockDogAPI = jest.fn(fetchDog);
+
+  test('testando o sucess da promise', () => {
+    return expect(mockDogAPI()).resolves.toStrictEqual('request sucess');
+  });
+
+  test('testando o fail da promise', () => {
+    return expect(fetchDog()).rejects.toStrictEqual('request failed')
   });
 
 });
