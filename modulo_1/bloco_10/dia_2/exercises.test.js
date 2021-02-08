@@ -1,9 +1,8 @@
 const uppercase = require('./uppercase');
 const getUserName = require('./getUserName');
-// const getRepos = require('./getRepos');
+const getRepos = require('./getRepos');
 const getAnimalByName = require('./getAnimalByName');
 const getAnimalsByAge = require('./getAnimalsByAge');
-const { test } = require('@jest/globals');
 
 describe('Exercicio 1', () => {
 
@@ -44,18 +43,18 @@ describe('Exercicio 3', () => {
 
 });
 
-// describe('Exercicio 4', () => {
-//   const url = 'https://api.github.com/orgs/tryber/repos'
+describe('Exercicio 4', () => {
+  const url = 'https://api.github.com/orgs/tryber/repos'
 
-//   test('Verifica se existe o repositorio sd-01-week4-5-project-todo-list', () => {
-//     return expect(getRepos(url)).resolves.toContain('sd-01-week4-5-project-todo-list');
-//   });
+  test('Verifica se existe o repositorio sd-01-week4-5-project-todo-list', () => {
+    return expect(getRepos(url)).resolves.toContain('sd-01-week4-5-project-todo-list');
+  });
 
-//   test('Verifica se existe o repositorio sd-01-week4-5-project-meme-generator', () => {
-//     return expect(getRepos(url)).resolves.toContain('sd-01-week4-5-project-meme-generator');
-//   });
+  test('Verifica se existe o repositorio sd-01-week4-5-project-meme-generator', () => {
+    return expect(getRepos(url)).resolves.toContain('sd-01-week4-5-project-meme-generator');
+  });
 
-// });
+});
 
 describe('Exercicio 5', () => {
   beforeEach(() => console.log('1 - beforeEach'));
