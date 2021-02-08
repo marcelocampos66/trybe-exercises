@@ -6,14 +6,20 @@ const result = {
 
 const fetchJoke = () => {
   return fetch('https://icanhazdadjoke.com/', { headers: { Accept: "application/json" } })
-  .then(response => response.json())
-  .then(data => data.joke);
+    .then(response => response.json())
+    .then(data => data.joke);
 };
 
-const mockFetchJoke = jest.fn(() => Promise.resolve({
+// criar um objeto parecido com o que a API me retorna.
+// emulando a chamada de uma API
+
+const fetch = jest.fn(() => Promise.resolve({
   json: () => Promise.resolve(result)
 }));
 
+// const mockFetchJoke = jest.fn(fetchJoke);
+// mockFetchJoke.mockResolvedValue('Whiteboards ... are remarkable.');
+
 test('Verifica se retorna uma piada', () => {
-  expect(fetchJoke()).resolves.toBe('Whiteboards ... are remarkable.');
+  return expect(fetchJoke()).resolves.toBe('Whiteboards ... are remarkable.');
 });

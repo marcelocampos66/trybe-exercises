@@ -1,5 +1,5 @@
 const randomNumber = require('./genRandomNum');
-const { numberOne, numberTwo, numberThree } = require('./tripleFunctions');
+const tripleFunctions = require('./tripleFunctions');
 const fetchDog = require('./dogAPI');
 jest.mock('./genRandomNum');
 jest.mock('./tripleFunctions');
@@ -57,6 +57,7 @@ describe('Exercicio 3', () => {
 });
 
 describe('Exercicio 4', () => {
+  const { numberOne, numberTwo, numberThree } = tripleFunctions;
 
   test('Faça uma nova implementação para a primeira função, mas agora ela deve retornar a string em caixa baixa', () => {
     const mockNumberOne = numberOne.mockImplementation((string) => string.toLowerCase());
@@ -89,35 +90,22 @@ describe('Exercicio 4', () => {
 
 describe('Exercicio 5', () => {
 
-  test('Utilizando as mesmas funções do exercício anterior, repita a implementação para a primeira função. Após repetir a implementação, restaure a implementação original e crie os testes necessários para validar', () => {
-    const one = jest.fn(numberOne);
-
-    one.mockImplementation((string) => string.toLowerCase());
-
-    expect(one('XABLAU')).toBe('xablau');
-    expect(one).toHaveBeenCalled();
-    expect(one).toHaveBeenCalledTimes(1);
-    expect(one).toHaveBeenCalledWith('XABLAU');
-
-    one.mockRestore();
-
-    // expect(one('xablau')).toBe('XABLAU');
-    // expect(one).toHaveBeenCalled();
-    // expect(one).toHaveBeenCalledTimes(2);
-    // expect(one).toHaveBeenCalledWith('xablau');
-  });
+  // ARQUIVO SEPARADO... exercise5.test.js
 
 });
 
 describe('Exercicio 6', () => {
   const mockDogAPI = jest.fn(fetchDog);
+  afterEach(() => mockDogAPI.mockReset());
 
   test('testando o sucess da promise', () => {
+    mockDogAPI.mockResolvedValue('request sucess');
     return expect(mockDogAPI()).resolves.toStrictEqual('request sucess');
   });
 
   test('testando o fail da promise', () => {
-    return expect(fetchDog()).rejects.toStrictEqual('request failed')
+    mockDogAPI.mockRejectedValue('request failed');
+    return expect(mockDogAPI()).rejects.toStrictEqual('request failed')
   });
 
 });
