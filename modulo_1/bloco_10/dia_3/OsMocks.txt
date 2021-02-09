@@ -1,0 +1,26 @@
+O objetivo de se mockar uma função, módulo ou requisição é permitir a quem desenvolve ter controle sobre todo o funcionamento de seus testes. Pense no projeto bônus do bloco 5, o Adivinhe a cor , em que era necessário gerar cores aleatórias. Como testar essas cores, se não sabemos quais serão geradas? Pense também em uma requisição de API que constantemente muda seu retorno. Como ter certeza do seu retorno e, principalmente, de que seu teste não está caindo em um falso-positivo ?
+
+Mockar o comportamento da função retornaNumeroAleatorio() para garantir que ela está, nesse teste, retornando um número par, seria a solução pra esse impasse!
+Dentre as principais formas de se mockar algo em Jest, destacam-se três:
+jest.fn();
+jest.mock();
+jest.spyOn();
+
+/////
+
+Há também como limpar, resetar ou restaurar mocks . Existem três métodos capazes de fazer isso:
+mock.mockClear()
+Útil quando você deseja limpar os dados de uso de uma simulação entre dois expect s;
+mock.mockReset()
+Faz o que o mockClear() faz;
+Remove qualquer retorno estipulado ou implementação;
+Útil quando você deseja resetar uma simulação para seu estado inicial;
+mock.mockRestore()
+Faz tudo que mockReset() faz;
+Restaura a implementação original;
+Útil para quando você quer simular funções em certos casos de teste e restaurar a implementação original em outros;
+
+/////
+
+Mock e funções assíncronas
+Nas funções assíncronas, utilizamos o mockResolvedValue(value) ou o mockRejectedValue(value) . Assim como nas demais implementações, podemos definir o retorno para apenas uma chamada com mockResolvedValueOnce(value) ou mockRejectedValueOnce(value) .
