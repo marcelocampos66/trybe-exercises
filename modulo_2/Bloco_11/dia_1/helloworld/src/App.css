@@ -1,0 +1,24 @@
+.hello-world {
+  background-color: gray;
+  color: blue;
+  font-weight: 700;
+  font-size: 40px;
+}
+
+.name {
+  background-color: black;
+  color: skyblue;
+  text-align: center;
+}
+
+.description {
+  background-color: lightcoral;
+  color: yellow;
+}
+
+.estou-aprendendo {
+  background-color: black;
+  color: yellow;
+  font-size: 30px;
+  text-align: center;
+}
