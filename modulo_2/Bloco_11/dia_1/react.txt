@@ -1,0 +1,6 @@
+
+npx create-react-app nome-do-app
+entra na pasta...
+npm install
+e para renderizar no navegador... 
+npm start
