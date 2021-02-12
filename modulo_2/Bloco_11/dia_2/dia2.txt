@@ -1,0 +1,129 @@
+    import React from 'react';
+
+    class Greeting extends React.Component {
+      render() {
+        return <h1>Hello, {this.props.name}</h1>;
+      }
+    }
+
+    export default Greeting;
+
+Analisando o código acima, temos:
+1- A declaração de um componente chamado Greeting .
+2- O componente Greeting herda da classe Component da biblioteca react .
+3- O componente Greeting descreve o que vai ser mostrado para quem usar a aplicação , declarado no método obrigatório render . Nesse caso, Greeting retorna: <h1>Hello, {this.props.name}</h1> .
+4- O componente Greeting possui como propriedade um objeto chamado props , que contém todos os dados passados como parâmetro na hora de chamar um componente. Ou seja, chamar <Greeting name="Samuel" /> faz com que o componente tenha uma prop igual a { name: "Samuel" } .
+5- Exportamos o componente Greeting de forma que ele possa ser reutilizado na aplicação.
+
+/////
+
+Props
+As props são umas das partes mais importantes de um componente. São por elas que você passa os valores para o componente, e é como o torna reutilizável em diferentes contextos. Elas são como os parâmetros de uma função.
+
+    import React from 'react';
+
+    class Greeting extends React.Component {
+      render() {
+        return <h1>Hello, {this.props.name} {this.props.lastName}</h1>;
+      }
+    }
+
+    export default Greeting;
+
+Agora o chamamos dentro do componente App :
+
+    import Greeting from './Greeting';
+
+    function App() {
+      return (
+        <main>
+          <Greeting name="Samuel" lastName="Silva" />
+        </main>
+      );
+    }
+
+    export default App;
+
+/////
+
+Ao atribuir as props name e lastName ao componente Greeting , o React automaticamente monta um objeto contendo as informações passadas e as disponibiliza para o componente montado numa variável chamada props , num formato parecido com esse:
+
+    const props = { name: 'Samuel', lastName: 'Silva' }
+
+Esse objeto props , por sua vez, é passado para o componente Greeting , o qual poderá resgatar tanto o nome como o sobrenome através do this.props.name e this.props.lastName .
+
+/////
+
+PropTypes, checagem de tipos.
+
+    import React from 'react';
+    import PropTypes from 'prop-types';
+
+    class Greeting extends React.Component {
+      render() {
+        return (<h1>Hello, {this.props.name} {this.props.lastName}</h1>);
+      }
+    }
+
+    Greeting.propTypes = {
+      name: PropTypes.string,
+      lastName: PropTypes.string,
+    };
+
+    export default Greeting;
+
+1- O primeiro passo para utilizar o prop-types é importá-lo no componente:
+      import PropTypes from 'prop-types';
+
+2-Em seguida, para executarmos a checagem de tipos no componente Greeting , adicionamos a seguinte estrutura antes do export default :
+
+    Greeting.propTypes = {
+      name: PropTypes.string,
+      lastName: PropTypes.string,
+    };
+
+É dentro dessa estrutura que ocorre a checagem das props . Basta pegarmos o nome da prop que queremos tipar , e usar a sintaxe de identificação apropriada para o caso.
+
+E caso o nosso componente seja renderizado sem nenhum valor numa prop , ainda será disparado o aviso? Em casos como esse, no qual as props são essenciais para o bom funcionamento do componente, é importante acrescentar o .isRequired - inglês para "é obrigatório" - após a definição do tipo da prop :
+
+    Greeting.propTypes = {
+      name: PropTypes.string.isRequired,
+      lastName: PropTypes.string.isRequired,
+    };
+
+Desse modo, sempre que o componente for renderizado sem uma das props ou com alguma do tipo errado, um aviso será disparado.
+
+Abaixo segue alguns dos principais validadores oferecidos pela PropTypes:
+
+MeuComponente.propTypes = {
+  // Todos os validadores aqui são, por padrão, validadores opcionais.
+  // Para torná-los obrigatórios basta adicionar .isRequired 
+  numeroObrigatório: PropTypes.number.isRequired,
+    
+  // Tipos básico do JS.
+  stringOpcional: PropTypes.string,
+  numeroOpcional: PropTypes.number,
+  booleanoOpcional: PropTypes.bool,
+  funcaoOpcional: PropTypes.func,
+  objetoOpcional: PropTypes.object,
+  arrayOpcional: PropTypes.array,
+  
+  // Um array de determinado tipo básico
+  arrayDe: PropTypes.arrayOf(PropTypes.number),
+  
+  // Um objeto de determinado tipo básico
+  objetoDe: PropTypes.objectOf(PropTypes.number),
+  
+  // Um objeto com forma específica
+  objetoComForma: PropTypes.shape({
+    name: PropTypes.string,
+    age: PropTypes.number,
+  }),
+    
+  // Um objeto que não permite props extras
+  objetoComFormatoRigoroso: PropTypes.exact({
+    name: PropTypes.string,
+    quantity: PropTypes.number,
+    avaibility: PropTypes.bool,
+  }), 
+};
