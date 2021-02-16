@@ -1,5 +1,7 @@
 import React from 'react';
 
+const skills = ['CSS', 'React', 'Jest', 'JavaScript', 'Python'];
+
 const task = (value) => {
   return (
     <li>{value}</li>
@@ -12,11 +14,7 @@ class ToStudyList extends React.Component {
       <div>
         <h1>Coisas que o Marcelo deve estudar:</h1>
         <ol>
-          {task('CSS')}
-          {task('React')}
-          {task('Jest')}
-          {task('JavaScript')}
-          {task('Python')}
+          {skills.map(skill => task(skill))}
         </ol>
       </div>
     )
