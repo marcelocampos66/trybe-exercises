@@ -7,7 +7,7 @@ class Pokedex extends React.Component {
     super(props);
     this.state = {
       pokemonIndex: 0,
-      filterType: 'all',
+      // filterType: 'all',
       pokemons: this.props.pokemons,
     }
     this.previousPokemon = this.previousPokemon.bind(this)
@@ -39,19 +39,18 @@ class Pokedex extends React.Component {
 
   filterPokemons(type) {
     const { pokemons } = this.props;
-    const { filterType } = this.state
 
     this.setState({
-      filterType: type,
+      // filterType: type,
       pokemonIndex: 0,
     });
 
-    if (filterType === 'all') {
+    if (type === 'all') {
       this.setState({
         pokemons: pokemons,
       })
     } else {
-      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filterType);
+      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === type);
       this.setState({
         pokemons: filteredPokemons,
       })
@@ -70,7 +69,7 @@ class Pokedex extends React.Component {
     const types = this.getPokemonTypes();
 
     // testes
-    console.log(this.state.filterType);
+    
     // 
 
     return (
