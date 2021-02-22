@@ -12,32 +12,7 @@ class Pokedex extends React.Component {
     }
     this.previousPokemon = this.previousPokemon.bind(this)
     this.nextPokemon = this.nextPokemon.bind(this)
-    this.setFilterType = this.setFilterType.bind(this)
     this.filterPokemons = this.filterPokemons.bind(this)
-  }
-
-  setFilterType(type) {
-    this.setState({
-      filterType: type,
-      pokemonIndex: 0,
-    });
-    this.filterPokemons();
-  }
-
-  filterPokemons() {
-    const { pokemons } = this.props;
-    const { filterType } = this.state
-
-    if (filterType === 'all') {
-      this.setState({
-        pokemons: pokemons,
-      })
-    } else {
-      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filterType);
-      this.setState({
-        pokemons: filteredPokemons,
-      })
-    }
   }
 
   previousPokemon() {
@@ -59,6 +34,27 @@ class Pokedex extends React.Component {
       }));
     } else {
       this.setState(({ pokemonIndex: 0 }));
+    }
+  }
+
+  filterPokemons(type) {
+    const { pokemons } = this.props;
+    const { filterType } = this.state
+
+    this.setState({
+      filterType: type,
+      pokemonIndex: 0,
+    });
+
+    if (filterType === 'all') {
+      this.setState({
+        pokemons: pokemons,
+      })
+    } else {
+      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filterType);
+      this.setState({
+        pokemons: filteredPokemons,
+      })
     }
   }
 
@@ -98,14 +94,14 @@ class Pokedex extends React.Component {
         <div className="pokedex-type-buttons-container">
           <button 
             className="pokedex-type-buttons"
-            onClick={ () => this.setFilterType('all') }>
+            onClick={ () => this.filterPokemons('all') }>
               All
           </button>
           {types.map(type => 
             <button
               key={type}
               className="pokedex-type-buttons"
-              onClick={ () => this.setFilterType(type) }>
+              onClick={ () => this.filterPokemons(type) }>
                 {type}
             </button>)}
         </div>

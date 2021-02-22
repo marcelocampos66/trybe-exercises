@@ -1,5 +1,6 @@
 import React from 'react';
 import PokemonCard from '../PokemonCard/PokemonCard';
+import './Pokedex.css';
 
 class Pokedex extends React.Component {
   constructor(props) {
@@ -7,44 +8,16 @@ class Pokedex extends React.Component {
     this.state = {
       pokemonIndex: 0,
       filterType: 'all',
-      // pokemons: this.props.pokemons,
+      pokemons: this.props.pokemons,
     }
     this.previousPokemon = this.previousPokemon.bind(this)
     this.nextPokemon = this.nextPokemon.bind(this)
+    this.setFilterType = this.setFilterType.bind(this)
     this.filterPokemons = this.filterPokemons.bind(this)
-    this.renderFilteredPokemon = this.renderFilteredPokemon.bind(this)
-
-    this.showPokemon = this.showPokemon.bind(this)
-  }
-
-  showPokemon() {
-    const { pokemons } = this.props;
-    const { pokemonIndex, filterType } = this.state
-    const teste = pokemons.filter(pokemon => pokemon.type === filterType);
-    console.log(teste[pokemonIndex]);
-  }
-
-  filterPokemons(type) {
-    this.setState({
-      filterType: type,
-      pokemonIndex: 0,
-    });
-  }
-
-  renderFilteredPokemon() {
-    const { pokemons } = this.props;
-    const { filterType, pokemonIndex } = this.state
-
-    if (filterType === 'all') {
-      return pokemons[pokemonIndex];
-    } else {
-      return pokemons.filter(pokemon => pokemon.type === filterType)[pokemonIndex]
-    }
   }
 
   previousPokemon() {
-    const { pokemons } = this.props;
-    
+    const { pokemons } = this.state;
     if (this.state.pokemonIndex > 0) {
       this.setState((state) => ({
         pokemonIndex: state.pokemonIndex - 1
@@ -55,16 +28,37 @@ class Pokedex extends React.Component {
   }
 
   nextPokemon() {
-    const { pokemons } = this.props;
-    // const selected = this.renderFilteredPokemon();
-    // console.log(selected);
-
+    const { pokemons } = this.state;
     if (this.state.pokemonIndex < pokemons.length - 1) {
       this.setState((state) => ({
         pokemonIndex: state.pokemonIndex + 1
       }));
     } else {
       this.setState(({ pokemonIndex: 0 }));
+    }
+  }
+
+  setFilterType(type) {
+    this.setState({
+      filterType: type,
+      pokemonIndex: 0,
+    });
+    this.filterPokemons();
+  }
+
+  filterPokemons() {
+    const { pokemons } = this.props;
+    const { filterType } = this.state
+
+    if (filterType === 'all') {
+      this.setState({
+        pokemons: pokemons,
+      })
+    } else {
+      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filterType);
+      this.setState({
+        pokemons: filteredPokemons,
+      })
     }
   }
 
@@ -75,21 +69,28 @@ class Pokedex extends React.Component {
   }
 
   render() {
-    const pokemon = this.renderFilteredPokemon();
+    const { pokemons, pokemonIndex } = this.state;
+    const pokemon = pokemons[pokemonIndex]
     const types = this.getPokemonTypes();
-    this.showPokemon();
+
+    // testes
     console.log(this.state.filterType);
+    // 
+
     return (
       <div className="pokedex-container">
+        <h1>Results: { pokemons.length }</h1>
         <PokemonCard pokemon={ pokemon } />
         <div className="pokedex-prev-next-buttons-container">
           <button 
-            onClick={ this.previousPokemon }
+            onClick={ () => this.previousPokemon() }
+            disabled={ pokemons.length <= 1 }
             className="pokedex-prev-next-buttons">
               Previous Pokemon
           </button>
           <button 
-            onClick={ this.nextPokemon }
+            onClick={ () => this.nextPokemon() }
+            disabled={ pokemons.length <= 1 }
             className="pokedex-prev-next-buttons">
               Next Pokemon
           </button>
@@ -97,14 +98,14 @@ class Pokedex extends React.Component {
         <div className="pokedex-type-buttons-container">
           <button 
             className="pokedex-type-buttons"
-            onClick={ () => this.filterPokemons('all') }>
+            onClick={ () => this.setFilterType('all') }>
               All
           </button>
           {types.map(type => 
             <button
               key={type}
               className="pokedex-type-buttons"
-              onClick={ () => this.filterPokemons(type) }>
+              onClick={ () => this.setFilterType(type) }>
                 {type}
             </button>)}
         </div>
