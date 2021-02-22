@@ -11,7 +11,7 @@ class Eventos extends React.Component {
   }
 
   handleChange(event) {
-    console.log(event.target.value);
+    // console.log(event.target.value);
     this.setState({ inputTextValue: event.target.value });
   }
 
