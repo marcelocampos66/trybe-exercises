@@ -22,7 +22,9 @@ class Eventos extends React.Component {
         <h1>Lista de Cores</h1>
         <input 
           type="text" 
-          onChange={this.handleChange} />
+          onChange={this.handleChange}
+          placeholder="Search"
+        />
         <ul>
           {
             colors
