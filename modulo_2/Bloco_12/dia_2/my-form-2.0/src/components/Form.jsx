@@ -32,8 +32,14 @@ class Form extends React.Component {
   }
 
   handleBlur({ target }) {
-    // let { value, name } = target;
+    
+    let { value } = target;
     console.log(target.value)
+    if (value.match(/^\d/)) {
+      console.log('comeca com number')
+      value = ''
+    }
+    
   }
 
   handleReset() {
