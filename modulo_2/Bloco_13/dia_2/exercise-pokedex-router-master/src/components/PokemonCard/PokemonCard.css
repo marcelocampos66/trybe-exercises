@@ -9,3 +9,17 @@
   border: 1px gray solid;
   border-radius: 10px;
 }
+
+.favorite {
+  background-color: black;
+  height: 20px;
+  width: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.favorite-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

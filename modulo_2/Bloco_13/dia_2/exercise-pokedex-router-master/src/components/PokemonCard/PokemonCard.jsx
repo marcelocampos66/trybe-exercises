@@ -5,7 +5,7 @@ import './PokemonCard.css';
 class PokemonCard extends React.Component {
   render() {
     const { pokemon } = this.props;
-    const { name, type, averageWeight, image, id } = pokemon;
+    const { name, type, averageWeight, image, id, isFavorite } = pokemon;
     return (
       <div className="pokemon-card">
         <div>
@@ -14,7 +14,10 @@ class PokemonCard extends React.Component {
           <p> {`Average weight: ${averageWeight.value} ${averageWeight.measurementUnit}`}</p>
         </div>
         <img src={image} alt={name} />
-        <Link to={`pokemons/${ id }`} >More details</Link>
+        <div className="favorite-container">
+          <Link to={`pokemons/${ id }`} >More details</Link>
+          { isFavorite && <div className="favorite"></div> }
+        </div>
       </div>
     )
   }

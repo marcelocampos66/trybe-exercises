@@ -1,13 +1,12 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import pokemons from '../../data';
+import './PokemonDetails.css';
 
 class PokemonDetails extends React.Component {
   render() {
-    // console.log(this.props.match.params.id)
+    const { pokemons, handleChange } = this.props;
     const pokemonId = parseInt(this.props.match.params.id);
     const pokemon = pokemons.find(pokemon => pokemon.id === pokemonId);
-    const { name, type, averageWeight, image, id, moreInfo } = pokemon;
+    const { name, type, averageWeight, image, id, moreInfo, foundAt, summary, isFavorite } = pokemon;
     const { value } = averageWeight;
     return (
       <div>
@@ -16,9 +15,23 @@ class PokemonDetails extends React.Component {
         <p>O tipo dele eh { type }</p>
         <p>Peso: { value } Kg</p>
         <img src={ image } alt={ name } />
+        <p>{ summary }</p>
+        <div className="pokemon-location">
+          {foundAt.map(({ location, map }) => (
+            <div key={location}>
+              <img src={map} alt={`${name} location`} />
+              <p><em>{location}</em></p>
+            </div>
+          ))}
+        </div>
         <div>
           <a target="_blank" href={ moreInfo }>More...</a>
         </div>
+        <input
+          type="checkbox"
+          checked={ isFavorite }
+          onChange={ ({ target: { checked } }) => handleChange(id, checked ) }
+        /> Favorite this Pokemon!
       </div>
     )
   }

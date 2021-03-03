@@ -1,0 +1,12 @@
+.favorite-card {
+  background-color: lightgreen;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1 1 auto;
+  width: 100%;
+  margin: 10px;
+  border: 1px gray solid;
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
