@@ -1,0 +1,29 @@
+.pokedex-container {
+  background-color: skyblue;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  width: 80%;
+  border: 1px solid black;
+  padding: 30px;
+}
+
+.pokedex-prev-next-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+}
+
+.pokedex-prev-next-buttons {
+  width: 130px;
+}
+
+.pokedex-type-buttons-container {
+  width: 100%;
+  margin: 10px;
+}
+
+.pokedex-type-buttons {
+  width: 100px;
+}
