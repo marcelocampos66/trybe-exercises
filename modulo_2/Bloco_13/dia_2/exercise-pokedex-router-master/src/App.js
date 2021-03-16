@@ -57,7 +57,7 @@ class App extends React.Component {
             />
             <Route path="/about" component={ About } />
             <Route
-              path="/pokemons/:id"
+              exact path="/pokemons/:id"
               render={
                 (props) => <PokemonDetails {...props} pokemons={pokemons} handleChange={ this.handleChange } /> 
               }

@@ -4,5 +4,8 @@ entra na pasta...
 npm install
 npm install --save-dev prop-types
 e para renderizar no navegador... 
+
+npm install react-router-dom
+
 npm start
 
