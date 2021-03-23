@@ -1,0 +1,122 @@
+React Redux é a biblioteca oficial para realizar a conexão entre React e Redux
+
+    npm install react-redux
+    npm install --save redux react-redux
+
+Store
+- É onde vamos armazenar todos os dados compartilhados da aplicação e é representado por um objeto JavaScript . O State é armazenado no Store do Redux .
+
+Action
+- É um objeto JavaScript que representa alguma mudança/alteração que precisa acontecer no State .
+
+Reducer
+- É uma função JavaScript que recebe o estado atual ( current state ) e a ação corrente ( current action ) e retorna um novo estado ( new state ). É responsabilidade dessa função decidir o que acontecerá com o estado dada uma ação( action ).
+
+Dispatch
+- É uma função que envia uma ação ( action ) para processamento.
+
+redux é a biblioteca que possui a implementação do Redux ;
+react-redux é a biblioteca que realiza a conexão entre o Redux e o React .
+
+*** EXEMPLOS ***
+
+**Store**
+
+    import { createStore, compose } from 'redux';
+    import rootReducer from '../reducers';
+
+    const store = createStore(rootReducer,
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+    );
+
+    export default store;
+
+    OU
+
+    import { createStore, compose } from 'redux';
+    import rootReducer from '../reducers';
+
+    const extension = window.devToolsExtension() || ((f) => f);
+
+    const store = createStore(rootReducer, compose(extension));
+
+    export default store;
+
+**Reducer**
+
+    const INITIAL_STATE = {
+      state: '',
+    };
+
+    function myReducer(state = INITIAL_STATE, action) {
+      switch (action.type) {
+        case 'NEW_ACTION':
+          return { state: action.state };
+        default:
+          return state;
+      }
+    }
+
+    export default myReducer;
+
+Arquivo index.js dentro do diretório reducers:
+
+    import { combineReducers } from 'redux';
+    import myReducer from './myReducer';
+
+    const rootReducer = combineReducers({ myReducer });
+
+    export default rootReducer;
+
+**Actions**
+
+    export const newAction = (state) => ({ type: 'NEW_ACTION', state });
+
+
+** Provider **
+Para utilizarmos o estado compartilhado que o Redux provê, precisamos trabalhar o src/index.js para adicionarmos a configuração do Provider. Exemplo:
+
+    import React from 'react';
+    import ReactDOM from 'react-dom';
+    // o provider é o meio pelo qual disponibilizamos o store
+    // com os estados de toda a aplicação para todos os demais componentes
+    import { Provider } from 'react-redux';
+    import store from './store';
+    import './index.css';
+    import App from './App';
+
+    ReactDOM.render(
+      <Provider store={ store }>
+        <App />
+      </Provider>,
+      document.getElementById('root'),
+    );
+
+
+**mapDispatchToProps e dispatch**
+lembrar de importar o metodo connect e as actions necessarias. Exemplo:
+    import { connect } from 'react-redux';
+    import { newAction } from './actions';
+
+Exemplo da dispatch:
+
+    const mapDispatchToProps = dispatch => ({
+    myFirstDispatch: state => dispatch(newAction(state))});
+
+**Connect**
+O método connect possui a seguinte estrutura: connect()() . É ele quem nos da acesso ao store do Redux.
+ No caso de utilizar somente o mapDispatchToProps , o primeiro parâmetro desse parênteses deverá ser null , já no caso de utilizar somente o mapStateToProps , que veremos logo a frente, o segundo parâmetro desse parênteses deverá ser null . Portanto, no caso de utilizar ambos mapStateToProps e mapDispatchToProps , essa é a sintaxe que o connect apresentará:
+
+    export default connect(mapStateToProps, mapDispatchToProps)(Component)
+
+
+**mapStateToProps**
+A função mapStateToProps , auto-descritiva, mapeia as entidades armazenadas nos estados para uma props .
+Note que as estruturas dos métodos mapStateToProps e mapDispatchToProps sempre serão as mesmas, o que mudará são as propriedades que vamos acessar ou actions que vamos disparar. Exemplo:
+
+    const mapStateToProps = state => ({
+    myFirstState: state.myReducer});
+
+    export default connect(mapStateToProps, null)(Component);
+
+
