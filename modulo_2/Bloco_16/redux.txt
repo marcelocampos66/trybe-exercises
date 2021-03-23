@@ -1,0 +1,38 @@
+** REDUX **
+
+Store - É onde vamos armazenar todos os dados compartilhados da aplicação e é representado por um objeto JavaScript. O State é armazenado no Store do Redux.
+
+Action - É um objeto JavaScript que representa alguma mudança/alteração que precisa acontecer no State.
+
+Reducer - É uma função JavaScript que recebe o estado atual (current state) e a ação corrente (current action) e retorna um novo estado (new state). É responsabilidade dessa função decidir o que acontecerá com o estado dada uma ação (action).
+
+Dispatch - É uma função que envia uma ação (action) para o processamento.
+
+
+store.dispatch() => Envia o objeto Action para o(s) reducer(s)
+
+store.getState() => Recupera um estado dentro do Store.
+
+Redux.createStore(reducer) => Cria o Store que vai conter os estados.
+
+combineReducers() => Essa função recebe um objeto como parâmetro contendo cada um dos seus reducers como elementos. EXEMPLO:
+
+    import { combineReducers } from 'redux';
+    import meuReducer from './meuReducer';
+    import meuOutroReducer from './meuOutroReducer';
+
+    const reducerCombinado = combineReducers({
+      meuReducer,
+      meuOutroReducer});
+
+    export default reducerCombinado;
+
+Agora basta fazer a sua importação no seu store para a mágica acontecer!
+
+    import { createStore } from 'redux';
+    // Importando o reducer combinado que fizemos logo acima
+    import reducerCombinado from './reducers/index';
+
+    const store = createStore(reducerCombinado);
+
+
