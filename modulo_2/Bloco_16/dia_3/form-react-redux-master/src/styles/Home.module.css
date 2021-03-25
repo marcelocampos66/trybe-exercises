@@ -1,0 +1,42 @@
+.container {
+  min-height: 100vh;
+  padding: 0 0.5rem;
+}
+
+.container2, .container {
+  padding:2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+fieldset {
+  width: 50vh;
+  height: auto;
+}
+
+label {
+  font-family:Arial, Helvetica, sans-serif;
+  font-size:12px;
+  color:#036;
+  font-weight:bold;
+}
+
+input[type=text], textarea {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+  outline: none;
+}
+
+label {
+  width: 40vh;
+}
+@media (max-width: 600px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+  }
+}

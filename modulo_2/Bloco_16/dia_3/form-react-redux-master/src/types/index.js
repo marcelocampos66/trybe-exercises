@@ -1,0 +1,11 @@
+export const NAME = 'NAME'; 
+export const EMAIL = 'EMAIL';
+export const CPF = 'CPF';
+export const ADRESS = 'ADRESS';
+export const CITY = 'CITY'
+export const STATE = 'STATE';
+export const COMPLEMENT = 'COMPLEMENT';
+export const ABSTRACT = 'ABSTRACT';
+export const OFFICE = 'OFFICE';
+export const DESCRIPTION = 'DESCRIPTION';
+export const DISABLE = 'DISABLE';
