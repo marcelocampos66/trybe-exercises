@@ -130,10 +130,13 @@ Para habilitar o uso dele na sua aplicação, é preciso fazer uso da função a
 
     // arquivo onde a redux store é criada
     import { createStore, applyMiddleware } from 'redux';
+    import { composeWithDevTools } from 'redux-devtools-extension'; // CASO FOR USAR A EXTENSAO
     import thunk from 'redux-thunk';
     import rootReducer from '/path/to/your/root/reducer';
 
     const store = createStore(rootReducer, applyMiddleware(thunk));
+OU CASO USE A EXTENSAO
+    const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
     ...
 
 Com redux-thunk , você consegue definir uma action creator que retorna uma função (que será invocada pelo redux-thunk ) em vez de retornar somente um objeto.

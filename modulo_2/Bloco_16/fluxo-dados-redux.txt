@@ -13,7 +13,9 @@
 
     - npx create-react-app my-app-redux;
     - npm install --save redux react-redux;
+    - npm install react-router-dom (para usar rotas)
     - npm install redux-thunk (para actions assincronas)
+    - npm install --save redux-devtools-extension (para usar a devtools com redux thunk)
     - npm install.
 
 Criar dentro do diretório src:

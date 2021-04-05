@@ -1,24 +1,41 @@
-export const REQUEST_MOVIES = 'REQUEST_MOVIES';
-export const RECEIVE_MOVIES = 'RECEIVE_MOVIES';
+*** EXEMPLO DE UTILIZACAO DO THUNK ***
+   
+    import { FETCHING, GETINFO, FAILINFO } from './actionsTypes';
+    import charAPI from '../services/charAPI';
 
-// action creator que retorna um objeto, que você tem feito até então
-const requestMovies = () => ({
-  type: REQUEST_MOVIES});
+    const fetchApi = () => ({
+      type: FETCHING,
+    });
 
-// outro action creator que retorna um objeto, que você tem feito até então
-const receiveMovies = (movies) => ({
-  type: RECEIVE_MOVIES,
-  movies});
+    const getInfo = (data) => ({
+      type: GETINFO,
+      data,
+    });
 
-// action creator que retorna uma função, possível por conta do pacote redux-thunk
-export function fetchMovies() {
-  return (dispatch) => { // thunk declarado
-    dispatch(requestMovies());
-    return fetch('alguma-api-qualquer.com')
-      .then((response) => response.json())
-      .then((movies) => dispatch(receiveMovies(movies)));
-  };
-}
+    const failInfo = (error) => ({
+      type: FAILINFO,
+      error,
+    });
+
+    export const apiThunk = (search) => {
+      return (dispatch) => {
+        dispatch(fetchApi());
+        return charAPI(search)
+          .then((data) => dispatch(getInfo(data)))
+          .catch((error) => dispatch(failInfo(error)));
+      };
+    };
+
+// ENQUANTO ISSO NO ARQUIVO INDEX NA PASTA SERVICES...
+
+    const APIURL = 'https://endpointdaapiaqui.com'
+
+    const charAPI = (char) => (
+      fetch(APIURL)
+        .then((response) => response.json())
+        .then((data) => data)
+        .catch((error) => error)
+    );
 
 // componente onde você usaria a action creator fetchMovies assíncrona como uma outra qualquer
 ...
