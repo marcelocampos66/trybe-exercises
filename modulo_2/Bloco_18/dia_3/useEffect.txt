@@ -1,0 +1,45 @@
+*** userEffect e Hooks ***
+
+Em resumo:
+O useEffect executa, quando disparado, a função que recebe como primeiro parâmetro;
+Se não receber um segundo parâmetro, ele executa a função sempre que o componente é renderizado;
+Se receber um array vazio como segundo parâmetro, ele executa a função somente quando o componente é montado;
+Quando ele recebe um array com valores dentro, sempre que algum desses valores é alterado, a função é executada;
+Se ele retorna uma função, essa função é executada quando o componente é desmontado e também antes da próxima renderização.
+Um hook customizado por convenção é definido com uma função que começa com a palavra use . É possível incorporar a lógica de outros hooks em seu funcionamento.
+
+
+import React, { useEffect } from react          //importacao
+
+useEffect( () => { 
+
+    return () => { aqui vai o willUnmount }
+
+ }, [ Aqui vai o componentDidUpdate ] )   // SE O ARRAY FOR VAZIO O COMPORTAMENTO EH DE DIDMOUNT
+
+
+
+
+Criando um hook em arquivo separado. obs: por padrao o nome do hook deve comecar com 'use'. Exemplo:
+
+    import { useState, useEffect } from 'react';
+
+
+    const useAbility = () => {
+      const [pokeUrl, setPokeUrl] = useState('');
+      const [pokemonAbilities, setPokemonAbilities] = useState([]);
+      useEffect( async ()=> {
+        if (pokeUrl !== '') {
+          const results = await fetch(pokeUrl).then()...
+          
+          const abilities = results.map(({ ability }) => ability);
+          setPokemonAbilities(abilities);
+        }
+      }, [pokeUrl]);
+
+      return [pokemonAbilities, setPokeUrl];
+    }
+
+    export default useAbility;
+
+
