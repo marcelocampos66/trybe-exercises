@@ -8,7 +8,7 @@ rode o comando e em seguida insira a senha do banco de dados.
 
     SHOW DATABASES;
 
-** COMANDOS MAIS COMUNS **
+*** COMANDOS MAIS COMUNS ***
 
 Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenciar das indicações de tabelas e colunas. Ah, é fundamental utilizar o ; (ponto e vírgula) ao final de cada comando SQL, caso contrário ele não irá funcionar.
 
@@ -40,5 +40,48 @@ Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenc
 
     - EX: CREATE DATABASE trybe;
 
+- O comando INSERT serve para inserir dados no banco de dados.
+- Com o comando é possível fazer isto de maneira mais dinâmica e dentro da própria aplicação, sem precisar recorrer a códigos PHP para inserir dados.
 
+    INSERT
+
+- O comando UPDATE serve para facilitar a atualização de dados nas tabelas.
+- Esse recurso é bastante simples e de grande utilidade, já que torna possível a alteração de diversos registros com poucos cliques.
+
+    UPDATE
+
+    Ex:
+    UPDATE MARCELO.Filme
+    SET AnoLancamento = 2018
+    WHERE FilmeId = 3;
+
+- Como o próprio nome já denuncia, o comando DELETE serve para excluir um ou mais registros de uma base de dados.
+
+    DELETE
+    Ex:
+    DELETE FROM MARCELO.Filme
+    WHERE FilmeId = 7;
+
+- Esse comando serve para criar novas tabelas em uma base de dados.
+
+    CREATE TABLE
+
+- Usamos WHERE para filtrar dados em um comando SQL. Essa cláusula deve ser seguida por uma expressão lógica.
+
+    WHERE
+    
+    EX:
+    SELECT
+      descricao,
+      precocusto
+    FROM
+      produtos
+    WHERE
+      descricao = "Caderno Escolar"
+
+- Usamos o DISTINCT para selecionar todos os valores diferentes da selecao.
+
+    DISTINCT
+
+    Ex: SELECT DISTINCT Country FROM Customers;
 

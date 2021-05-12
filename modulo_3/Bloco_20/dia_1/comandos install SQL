@@ -68,3 +68,12 @@ Na sequência, remova os arquivos do mysql que podem ter ficado para trás.
 
 Se a desinstalação for concluída com sucesso, o comando mysql --version não deve retornar a versão do seu mysql.
 
+
+**Constraints**
+
+    *NOT NULL*
+    *UNIQUE*
+    *PRIMARY KEY*
+    *FOREIGN KEY*
+    *DEFAULT*
+
