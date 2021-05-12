@@ -1,0 +1,70 @@
+***Instalando MySQL Server***
+Utilize os seguintes comandos:
+
+    sudo apt update
+
+    sudo apt install mysql-server
+
+Verificando o status da instalação:
+
+    sudo systemctl status mysql
+
+Por padrão, após a instalação, seu servidor vai estar configurado para iniciar junto ao sistema. Caso não queira que isso aconteça, para poupar memória RAM, você pode desativar o início automático utilizando o comando:
+
+    sudo systemctl disable mysql
+
+A primeira vez que for utilizar após iniciar o computador, será necessário iniciar o servidor com o comando:
+
+    sudo systemctl start mysql
+
+Verificar o Status do SQL:
+
+    sudo systemctl status mysql
+
+Se desejar ativar novamente que ele inicie junto ao computador, basta usar o comando:
+
+    sudo systemctl enable mysql
+
+
+***Definir uma senha para acesso ao banco de dados***
+
+Caso tenha realizado o passo a passo no video de instalação do MySQL e a senha para o banco de dados já esteja definida, essa seção pode ser ignorada.
+Tanto para segurança quanto pra utilização no workbench (logo mais), será preciso entrar com a senha que você definir. Note que estamos falando aqui da senha do seu servidor mysql, e não da sua senha de super-usuário (root). Para isso, você rodará o seguinte comando:
+
+     mysql -u root -p
+
+Como não há senha definida ainda, nenhuma senha deve ser digitada. Continue dando 'Enter'.
+Caso ocorra algum erro, tente novamente adicionando o sudo igual o comando abaixo.
+
+     sudo mysql -u root -p
+
+Rode o comando, atentando para parte 'sua_senha_aqui' , que deve ser alterada para senha que vc definir (podendo também ser vazia '' , assumindo um ambiente de testes e desenvolvimento) :
+
+     ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'sua_senha_aqui'; flush privileges;
+     
+     **-- EX: ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '1234'; flush privileges;**
+
+
+
+
+*** Desinstalando o MySQL Server ***
+
+Linux
+Caso sua instalação tenha retornado algum problema, siga os passos a seguir para desinstalar e tente realizar a instalação novamente.
+Preste muita atenção aos comandos.
+Primeiro remova todos os pacotes instalados:
+
+    sudo apt-get remove mysql-server mysql-client mysql-common
+
+Agora remova os arquivos de dependências que não são mais necessários e, em seguida, remova as versões antigas dos arquivos de pacotes.
+
+    sudo apt-get autoremove
+    sudo apt-get autoclean
+
+Na sequência, remova os arquivos do mysql que podem ter ficado para trás.
+
+    sudo rm -rf /var/lib/mysql
+    sudo rm -rf /etc/mysql
+
+Se a desinstalação for concluída com sucesso, o comando mysql --version não deve retornar a versão do seu mysql.
+
