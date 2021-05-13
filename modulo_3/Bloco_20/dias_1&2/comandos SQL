@@ -1,0 +1,109 @@
+*** PARA ACESSAR O SQL ***
+
+rode o comando e em seguida insira a senha do banco de dados.
+
+    mysql -u root -p
+
+É possível ver todos os bancos de dados que estão instalados atualmente digitando o seguinte comando:
+
+    SHOW DATABASES;
+
+*** COMANDOS MAIS COMUNS ***
+
+Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenciar das indicações de tabelas e colunas. Ah, é fundamental utilizar o ; (ponto e vírgula) ao final de cada comando SQL, caso contrário ele não irá funcionar.
+
+- O comando USE serve pra definir a referência do banco de dados que será utilizado na query:
+
+    USE nome_do_banco_de_dados_que_quero_conectar;
+
+    -- EX:
+    USE sakila;
+    SELECT country_id, city FROM city;
+
+- Uma outra forma de fazer referência ao banco, sem ter que rodar o USE é no formato banco_de_dados.tabela:
+
+    SELECT * FROM banco_de_dados.tabela;
+
+    -- EX: SELECT * FROM trybe.students;
+    -- EX: SELECT concat(first_name, ' ', last_name ) AS 'Nome Completo' FROM sakila.actor;
+
+- Para retornar todas as tabelas inicializadas no seu server:
+
+    SHOW TABLES;
+
+- Visualizar estrutura de uma tabela:
+
+    DESCRIBE nome_da_tabela;
+
+    -- EX: DESCRIBE students;
+
+- Criar um banco de dados:
+
+    CREATE DATABASE nome_do_banco_de_dados;
+
+    - EX: CREATE DATABASE trybe;
+
+- O comando INSERT serve para inserir dados no banco de dados.
+- Com o comando é possível fazer isto de maneira mais dinâmica e dentro da própria aplicação, sem precisar recorrer a códigos PHP para inserir dados.
+
+    INSERT
+
+- O comando UPDATE serve para facilitar a atualização de dados nas tabelas.
+- Esse recurso é bastante simples e de grande utilidade, já que torna possível a alteração de diversos registros com poucos cliques.
+
+    UPDATE
+
+    Ex:
+    UPDATE MARCELO.Filme
+    SET AnoLancamento = 2018
+    WHERE FilmeId = 3;
+
+- Como o próprio nome já denuncia, o comando DELETE serve para excluir um ou mais registros de uma base de dados.
+
+    DELETE
+    Ex:
+    DELETE FROM MARCELO.Filme
+    WHERE FilmeId = 7;
+
+- Esse comando serve para criar novas tabelas em uma base de dados.
+
+    CREATE TABLE
+
+- Usamos WHERE para filtrar dados em um comando SQL. Essa cláusula deve ser seguida por uma expressão lógica.
+
+    WHERE
+    
+    EX:
+    SELECT
+      descricao,
+      precocusto
+    FROM
+      produtos
+    WHERE
+      descricao = "Caderno Escolar"
+
+- Usamos o DISTINCT para selecionar todos os valores diferentes da selecao(selecionar todos exceto os repetidos).
+
+    DISTINCT
+
+    Ex: SELECT DISTINCT Country FROM Customers;
+
+- Usamos o COUNT para contar as quantidades de ocorrencias de um determinado dado.
+
+    COUNT
+    EX: SELECT COUNT(*) FROM sakila.actor;
+    EX: SELECT COUNT(DISTINCT first_name) FROM sakila.actor;
+    EX: SELECT COUNT(district) FROM sakila.address WHERE district = 'Alberta';
+
+- Usamos o LIMIT para limitar o numero de retornos da nossa query.
+
+    EX: SELECT * FROM sakila.rental LIMIT 20;
+
+- Para pular uma certa quantidade de linhas do seu resultado, você pode usar o comando OFFSET.
+
+    EX: SELECT * FROM sakila.rental LIMIT 10 OFFSET 3;
+
+- Podemos usar o comando ORDER BY para ordenar de acordo com alguma regra ou simplesmente usa-lo para ordernar em ordem alfabetica.
+
+    Ex: SELECT * FROM sakila.address ORDER BY address; // Usamos ASC para ordem Ascendente e DESC para ordem decrescente.
+    EX: SELECT * FROM sakila.address ORDER BY address DESC, district;
