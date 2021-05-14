@@ -1,0 +1,224 @@
+*** PARA ACESSAR O SQL ***
+
+rode o comando e em seguida insira a senha do banco de dados.
+
+    mysql -u root -p
+
+É possível ver todos os bancos de dados que estão instalados atualmente digitando o seguinte comando:
+
+    SHOW DATABASES;
+
+*** COMANDOS MAIS COMUNS ***
+
+Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenciar das indicações de tabelas e colunas. Ah, é fundamental utilizar o ; (ponto e vírgula) ao final de cada comando SQL, caso contrário ele não irá funcionar.
+
+- O comando USE serve pra definir a referência do banco de dados que será utilizado na query:
+
+    USE nome_do_banco_de_dados_que_quero_conectar;
+
+    -- EX:
+    USE sakila;
+    SELECT country_id, city FROM city;
+
+- Uma outra forma de fazer referência ao banco, sem ter que rodar o USE é no formato banco_de_dados.tabela:
+
+    SELECT * FROM banco_de_dados.tabela;
+
+    -- EX: SELECT * FROM trybe.students;
+    -- EX: SELECT concat(first_name, ' ', last_name ) AS 'Nome Completo' FROM sakila.actor;
+
+- Para retornar todas as tabelas inicializadas no seu server:
+
+    SHOW TABLES;
+
+- Visualizar estrutura de uma tabela:
+
+    DESCRIBE nome_da_tabela;
+
+    -- EX: DESCRIBE students;
+
+- Criar um banco de dados:
+
+    CREATE DATABASE nome_do_banco_de_dados;
+
+    - EX: CREATE DATABASE trybe;
+
+- Como o próprio nome já denuncia, o comando DELETE serve para excluir um ou mais registros de uma base de dados.
+
+    DELETE
+    Ex:
+    DELETE FROM MARCELO.Filme
+    WHERE FilmeId = 7;
+
+- Esse comando serve para criar novas tabelas em uma base de dados.
+
+    CREATE TABLE
+
+- Usamos o DISTINCT para selecionar todos os valores diferentes da selecao(selecionar todos exceto os repetidos).
+
+    DISTINCT
+
+    Ex: SELECT DISTINCT Country FROM Customers;
+    Ex: SELECT COUNT(DISTINCT Country) FROM Customers // Aqui o count eh realizado no resultado do distinct
+
+- Usamos o COUNT para contar as quantidades de ocorrencias de um determinado dado.
+
+    COUNT
+    EX: SELECT COUNT(*) FROM sakila.actor;
+    EX: SELECT COUNT(DISTINCT first_name) FROM sakila.actor;
+    EX: SELECT COUNT(district) FROM sakila.address WHERE district = 'Alberta';
+
+- Usamos o LIMIT para limitar o numero de retornos da nossa query.
+
+    EX: SELECT * FROM sakila.rental LIMIT 20;
+
+- Para pular uma certa quantidade de linhas do seu resultado, você pode usar o comando OFFSET.
+
+    EX: SELECT * FROM sakila.rental LIMIT 10 OFFSET 3;
+
+- Podemos usar o comando ORDER BY para ordenar de acordo com alguma regra ou simplesmente usa-lo para ordernar em ordem alfabetica.
+
+    Ex: SELECT * FROM sakila.address ORDER BY address; // Usamos ASC para ordem Ascendente e DESC para ordem decrescente.
+    EX: SELECT * FROM sakila.address ORDER BY address DESC, district;
+
+- Usamos WHERE para filtrar dados em um comando SQL. Essa cláusula deve ser seguida por uma expressão lógica.
+
+    WHERE
+    
+    EX:
+    SELECT descricao, precocusto FROM produtos WHERE descricao = "Caderno Escolar"
+    EX:
+    SELECT * FROM sakila.film WHERE rating = 'G' OR rating = 'PG' OR rating = 'PG-13';
+    SELECT * FROM sakila.film WHERE rating = 'G' AND rating = 'PG-13';
+    SELECT * FROM sakila.rental WHERE return_date IS NULL;
+    SELECT * FROM sakila.address WHERE address2 IS NOT NULL;
+    SELECT first_name FROM sakila.customer WHERE active <> 1 AND store_id = 2 AND first_name NOT LIKE 'KENNETH' ORDER BY first_name;
+    SELECT title, description, release_year, replacement_cost FROM sakila.film WHERE rating <> 'NC-17' AND replacement_cost > 18 ORDER BY replacement_cost DESC, title LIMIT 100;
+    SELECT COUNT(first_name) FROM sakila.customer WHERE store_id = 1 AND active = 1;
+    SELECT * FROM sakila.customer WHERE active = 0 AND store_id = 1;
+    SELECT title FROM sakila.film WHERE rating = 'NC-17' ORDER BY rental_rate, title LIMIT 50;
+       
+    SELECT * FROM sakila.payment WHERE amount = 0.99 OR amount = 2.99 AND staff_id = 2; // a query é executada como se tivesse os seguintes parênteses: amount = 0.99 OR (amount = 2.99 AND staff_id = 2)
+    
+    SELECT * FROM sakila.paymentWHERE (amount = 0.99 OR amount = 2.99) AND staff_id = 2; // a expressão dentro dos parênteses é avaliada, e todos os resultados que satisfazem a condição são retornados. Na sequência, a expressão do lado direito do AND é avaliada.
+
+- Usamos o LIKE para buscar por meio de uma sequência específica de caracteres, como no exemplo acima. Além disso, dois "coringas", ou modificadores, são normalmente usados com o LIKE :
+    % - O sinal de percentual, que pode representar zero, um ou múltiplos caracteres
+    _ - O underscore (às vezes chamado de underline, no Brasil), que representa um único caractere
+
+    SELECT * FROM sakila.film WHERE title NOT LIKE 'academy%'; // o uso do % quer dizer nessa query 'que comece com a palavra academy'
+    SELECT * FROM sakila.film WHERE title LIKE '%don'; // o uso do % quer dizer nessa query 'que termine com a palavra don'
+    SELECT * FROM sakila.film WHERE title LIKE '%plu%'; // Encontra qualquer resultado que contém "plu"
+    SELECT * FROM sakila.film WHERE title LIKE 'p%r'; // Encontra qualquer resultado que inicia com "p" e finaliza com "r"
+    SELECT * FROM sakila.film WHERE title LIKE '_C%'; // Encontra qualquer resultado em que o segundo caractere da frase é "C"
+    SELECT * FROM sakila.film WHERE title LIKE '________'; // Encontra qualquer resultado em que o título possui exatamente 8 caracteres
+    SELECT * FROM sakila.film WHERE title LIKE 'E__%'; // Encontra todas as palavras com no mínimo 3 caracteres e que iniciam com E
+
+    SELECT * FROM film WHERE title LIKE '%ace%';
+    SELECT * FROM sakila.film WHERE description LIKE '%china';
+    SELECT * FROM sakila.film WHERE description LIKE '%girl%' AND title LIKE '%lord' LIMIT 2;
+    SELECT * FROM sakila.film WHERE title LIKE '___gon%';
+    SELECT * FROM sakila.film WHERE title LIKE '___gon%' AND description LIKE '%documentary%';
+    SELECT * FROM sakila.film WHERE title LIKE '%academy' OR title LIKE 'mosquito%';
+    SELECT * FROM sakila.film WHERE description LIKE '%monkey%' AND description LIKE '%sumo%' LIMIT 6;
+
+- O IN eh utiliazado da seguinte maneira:
+
+    // SEM O IN
+    SELECT * FROM sakila.actor
+    WHERE first_name = 'PENELOPE'
+    OR first_name = 'NICK'
+    OR first_name = 'ED'
+    OR first_name = 'JENNIFER';
+
+    // COM O IN
+    SELECT * FROM sakila.actor WHERE first_name IN ('PENELOPE','NICK','ED','JENNIFER');
+
+    //Pode ser utilizado para numeros tbm:
+    SELECT * FROM sakila.customer WHERE customer_id IN (1, 2, 3, 4, 5);
+
+    //De uma forma geral a Sintaxe do uso do IN:
+    SELECT * FROM banco_de_dados
+    WHERE coluna IN (valor1, valor2, valor3, valor4, ..., valorN);
+
+    // OU
+    SELECT * FROM banco_de_dados
+    WHERE coluna IN (expressão);
+
+- Operador BETWEEN eh uma opção quando queremos trabalhar com faixas de resultados:
+
+    EX:
+    SELECT title, length FROM sakila.film WHERE length BETWEEN 50 AND 120;
+
+    //Com strings:
+    SELECT * FROM sakila.language WHERE name BETWEEN 'Italian' AND 'Mandarin' ORDER BY name;
+
+    // com datas, basta que você digite o valor no formato padrão da data, que é YYYY-MM-DD HH:MM:SS , sendo os valores de horas, minutos e segundos opcionais.
+    SELECT rental_id, rental_date FROM sakila.rental WHERE rental_date BETWEEN '2005-05-27' AND '2005-07-17';
+
+- FIXACAO DO USO DO IN OU BETWEEN:
+
+    SELECT first_name, last_name, email FROM sakila.customer WHERE last_name IN('hicks', 'crawford', 'henry', 'boyd', 'mason', 'morales', 'kennedy') ORDER BY first_name;
+    SELECT email FROM sakila.customer WHERE address_id BETWEEN 172 AND 176 ORDER BY email;
+    SELECT COUNT(*) FROM sakila.payment WHERE payment_date BETWEEN '2005-05-01' AND '2005-08-01';
+    SELECT title, release_year, rental_duration FROM sakila.film WHERE rental_duration BETWEEN 3 AND 6 ORDER BY rental_duration DESC, title;
+    SELECT title, rating FROM sakila.film WHERE rating IN('G', 'PG', 'PG-13') ORDER BY title LIMIT 500;
+
+- Tipos de dados temporais, Date e DateTime
+
+    DATE - Possui apenas data, no formato YYYY-MM-DD na faixa de 1001-01-01 até 9999-12-31
+    DATETIME - Possui data e tempo, no formato YYYY-MM-DD HH:MM:SS com a faixa de 1000-01-01 00:00:00 até 9999-12-31 23:59:59 .
+
+    // Achar por Data:
+    // Usando a função DATE(coluna_do_tipo_date):
+    SELECT * FROM sakila.payment WHERE DATE(payment_date) = '2005-07-31';
+
+    // Usando LIKE:
+    // Encontra todos pagamentos deste dia, ignorando horas, minutos e segundos:
+    SELECT * FROM sakila.payment WHERE payment_date LIKE '2005-07-31%';
+
+    // Encontra um pagamento com dia e hora exatos:
+    SELECT * FROM sakila.payment WHERE payment_date LIKE '2005-08-20 00:30:52';
+
+    // Usando BETWEEN:
+    // Encontra pagamentos especificando um valor mínimo e um valor máximo para a data:
+    SELECT * FROM sakila.payment WHERE payment_date BETWEEN '2005-05-26 00:00:00' AND '2005-05-27 23:59:59';
+
+    SELECT DATE(payment_date) FROM sakila.payment; -- YYYY-MM-DD
+    SELECT YEAR(payment_date) FROM sakila.payment; -- Ano
+    SELECT MONTH(payment_date) FROM sakila.payment; -- Mês
+    SELECT DAY(payment_date) FROM sakila.payment; -- Dia
+    SELECT HOUR(payment_date) FROM sakila.payment; -- Hora
+    SELECT MINUTE(payment_date) FROM sakila.payment; -- Minuto
+    SELECT SECOND(payment_date) FROM sakila.payment; -- Segundo
+
+    // Fixacao
+    SELECT COUNT(*) FROM sakila.payment WHERE DATE(payment_date) = '2005-05-25';
+    SELECT COUNT(*) FROM sakila.payment WHERE payment_date BETWEEN '2005-07-01' AND '2005-08-22';
+    SELECT 
+    YEAR(rental_date) AS Ano,
+    MONTH(rental_date) AS Mes,
+    DAY(rental_date) AS Dia,
+    HOUR(rental_date) AS Hora,
+    MINUTE(rental_date) AS Minutos,
+    SECOND(rental_date) AS Segundos
+    FROM
+        sakila.rental
+    WHERE
+        rental_id = 10330;
+    SELECT * FROM sakila.payment WHERE DATE(payment_date) = '2005-07-28' AND HOUR(payment_date) >= 22;
+    
+- O comando INSERT serve para inserir dados no banco de dados.
+- Com o comando é possível fazer isto de maneira mais dinâmica e dentro da própria aplicação, sem precisar recorrer a códigos PHP para inserir dados.
+
+    INSERT
+
+- O comando UPDATE serve para facilitar a atualização de dados nas tabelas.
+- Esse recurso é bastante simples e de grande utilidade, já que torna possível a alteração de diversos registros com poucos cliques.
+
+    UPDATE
+
+    Ex:
+    UPDATE MARCELO.Filme
+    SET AnoLancamento = 2018
+    WHERE FilmeId = 3;
