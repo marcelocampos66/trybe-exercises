@@ -43,13 +43,6 @@ Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenc
 
     - EX: CREATE DATABASE trybe;
 
-- Como o próprio nome já denuncia, o comando DELETE serve para excluir um ou mais registros de uma base de dados.
-
-    DELETE
-    Ex:
-    DELETE FROM MARCELO.Filme
-    WHERE FilmeId = 7;
-
 - Esse comando serve para criar novas tabelas em uma base de dados.
 
     CREATE TABLE
@@ -212,13 +205,133 @@ Por convenção, utilizamos as palavras chave do SQL em caixa alta para diferenc
 - Com o comando é possível fazer isto de maneira mais dinâmica e dentro da própria aplicação, sem precisar recorrer a códigos PHP para inserir dados.
 
     INSERT
+    Inserindo uma unica linha:
+    Ex: INSERT INTO nome_da_tabela (coluna1, coluna2) VALUES ('valor_coluna1', 'valor_coluna2');
+
+    Inserindo varias linhas de uma vez:
+    Ex: INSERT INTO nome_da_tabela (coluna1, coluna2) VALUES ('valor_1','valor_2'), ('valor_3','valor_4'), ('valor_5','valor_6');
+
+    Podemos ignorar os erros durante a inserção usando o INSERT IGNORE. Colunas com o auto_increment terao seus valores gerados automaticamente valor + 1.
+
+    INSERT SELECT (Inserindo dados de uma outra tabela)
+    Ex: 
+    INSERT INTO tabelaA (coluna1, coluna2)
+    SELECT tabelaB.coluna1, tabelaB.coluna2
+    FROM tabelaB
+    WHERE tabelaB.nome_da_coluna <> 'algumValor'
+    ORDER BY tabelaB.coluna_de_ordenacao;
+
+    FIXACAO:
+    INSERT INTO sakila.actor (first_name, last_name) SELECT first_name, last_name FROM sakila.customer LIMIT 5;
+    INSERT INTO sakila.category (name) VALUES ('categoria1'), ('categoria2'), ('categoria3');
+    INSERT INTO sakila.store (manager_staff_id, address_id) VALUES (3, 3);
 
 - O comando UPDATE serve para facilitar a atualização de dados nas tabelas.
 - Esse recurso é bastante simples e de grande utilidade, já que torna possível a alteração de diversos registros com poucos cliques.
 
     UPDATE
 
+    UPDATE nome_da_tabela SET propriedade_a_ser_alterada = 'novo valor para coluna' WHERE alguma_condicao;
+
     Ex:
     UPDATE MARCELO.Filme
     SET AnoLancamento = 2018
     WHERE FilmeId = 3;
+    
+    UPDATE sakila.staff SET first_name = 'Rannveig' WHERE first_name = 'Ravein';
+
+    mais de uma coluna ao mesmo tempo:
+    UPDATE sakila.staff SET first_name = 'Rannveig', last_name = 'Jordan' WHERE staff_id = 4;
+
+    /////
+
+    podemos fazer uma atualização em massa.
+    Opção 1 - Incluindo a lista de condições fixas:
+    UPDATE sakila.actor SET first_name = 'JOE' WHERE actor_id IN (1,2,3);
+
+    Opção 2 - Especificando como cada entrada será alterada individualmente:
+
+    UPDATE sakila.actor
+    SET first_name = (
+    CASE actor_id WHEN 1 THEN 'JOE' -- se actor_id = 1, alterar first_name para 'JOE'
+                  WHEN 2 THEN 'DAVIS' -- se actor_id = 2, alterar first_name para 'DAVIS'
+                  WHEN 3 THEN 'CAROLINE' -- se actor_id = 3, alterar first_name para 'CAROLINE'
+    END);
+
+    /////
+
+    Fazendo um UPDATE de forma sequencial:
+    UPDATE nome_da_tabela
+    SET coluna1 = valor1, coluna2 = valor2
+    [WHERE condições]
+    [ORDER BY expressao [ ASC | DESC ]]
+    [LIMIT quantidade_resultados];
+
+    -- Exemplo:
+    UPDATE sakila.staff
+    SET password = 'FavorResetarSuaSenha123'
+    WHERE active = 1
+    ORDER BY last_update
+    LIMIT 2;
+
+    /////
+
+    FIXACAO:
+    UPDATE sakila.actor SET first_name = 'JULES' WHERE first_name = 'JULIA';
+    UPDATE sakila.category SET name = 'Science Fiction' WHERE name = 'Sci-Fi';
+    UPDATE sakila.film SET rental_rate = 25 WHERE (length > 100) AND rating IN('G', 'PG', 'PG-13') AND replacement_cost > 20;
+    UPDATE sakila.film 
+    SET 
+        rental_rate = (CASE
+            WHEN length BETWEEN 0 AND 100 THEN 10
+            WHEN length > 100 THEN 20
+        END);
+
+    /////
+
+Uma curiosidade sobre o UPDATE e o DELETE no MySQL Server é que, por padrão, existe uma configuração chamada safe updates mode que só vai te permitir executá-los caso eles incluam quais IDs devem ser modificados. Então, caso você tente fazer a query abaixo, ela não funcionaria por não incluir o ID. Para evitar essa restrição, rode o seguinte comando em uma janela de query dentro do MySQL Workbench sempre que abri-lo para desabilitar essa funcionalidade, antes de executar seus comandos de UPDATE ou DELETE:
+
+    SET SQL_SAFE_UPDATES = 0;
+
+Para quem está ainda está se familiarizando com o MySQL, o --safe-updates (ou - -i-am-a-dummy , sim, é uma propriedade real do MySQL) pode ser uma configuração segura para utlizar operadores de alteração de dados. Ele é útil para casos em que você tenha emitido um comando UPDATE ou DELETE , mas esquecido de incluir WHERE para indicar quais linhas devem ser modificadas, evitanto que a query atualize ou exclua todas as linhas da tabela.
+O --safe-updates exige que você inclua um valor chave (key value), por exemplo os ids (lembrando que os valores da coluna id de uma tabela são do tipo KEY ) dos itens selecionados para executar o UPDATE ou o DELETE . Essa camada de segurança é importante em bancos reais executando em ambientes de produção e ajuda a prevenir acidentes. Este modo também restringe querys SELECT que produzem resultados muito grandes, com uma quantidade excessiva de linhas.
+A opção --safe-updates exige que o mysql execute a seguinte instrução ao se conectar ao servidor:
+
+    SET sql_safe_updates=1, sql_select_limit=1000, max_join_size=1000000;
+
+Quando ocorre um erro de --safe-updates , a mensagem de erro inclui o primeiro diagnóstico que foi produzido, para fornecer informações sobre o motivo da falha. Por exemplo, a mensagem pode indicar que o UPDATE esta sendo executado com um operador WHERE que não se refere a uma coluna do tipo KEY (veja a imagem abaixo), nesse caso voce pode desabilitar o --safe-updates , ou utilizar uma coluna KEY como referência do seu operador WHERE . Lembre-se que ler e interpretar os erros pode ajudar na sua solução!
+
+    /////
+
+- Como o próprio nome já denuncia, o comando DELETE serve para excluir um ou mais registros de uma base de dados.
+
+    DELETE
+    Ex:
+    DELETE FROM banco_de_dados.tabela WHERE coluna = 'valor'; -- O WHERE é opcional. Porém, sem ele, todas as linhas da tabela seriam excluídas.
+    DELETE FROM MARCELO.Filme WHERE FilmeId = 7;
+
+    FIXACAO:
+    DELETE FROM sakila.film_text WHERE description LIKE '%saga%';
+    TRUNCATE sakila.film_actor; // 'maneira mais performatica'
+    TRUNCATE sakila.film_category;
+
+    /////
+
+Meu DELETE não foi permitido...
+Caso haja relações entre as tabelas ( primary key e foreign keys ) e existam restrições aplicadas a elas, ao executar o DELETE ocorrerá uma ação de acordo com a restrição que tiver sido imposta na criação da foreign key . Essas restrições podem ser as seguintes:
+
+    -- Rejeita o comando DELETE.
+    ON DELETE NO ACTION;
+
+    -- Rejeita o comando DELETE.
+    ON DELETE RESTRICT;
+
+    -- Permite a exclusão dos registros da tabela pai, e seta para NULL os registros da tabela filho.
+    ON DELETE SET NULL;
+
+    -- Exclui a informação da tabela pai e registros relacionados.
+    ON DELETE CASCADE;
+
+Se tem certeza absoluta de que quer excluir os registros de uma tabela de uma maneira mais rápida, para efeitos de testes ou necessidade, o TRUNCATE é mais rápido que o DELETE . A função principal e única do TRUNCATE é de limpar (excluir todos os registros) de uma tabela, não sendo possível especificar o WHERE . Por isso, o TRUNCATE só pode ser usado nesse cenário.
+
+    TRUNCATE banco_de_dados.tabela;
