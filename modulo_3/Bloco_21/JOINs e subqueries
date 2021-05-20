@@ -1,0 +1,297 @@
+*INNER JOIN*
+
+
+Como foi visto, o INNER JOIN permite retornar todos os resultados em que a condição da cláusula ON for satisfeita. A sintaxe de um INNER JOIN é a seguinte:
+
+    SELECT t1.coluna, t2.coluna
+    FROM tabela1 AS t1
+    INNER JOIN tabela2 AS t2
+    ON t1.coluna_em_comum = t2.coluna_em_comum;
+
+    SELECT city.city, city.country_id, country.country
+    FROM sakila.city AS city
+    INNER JOIN sakila.country AS country
+    ON city.country_id = country.country_id;
+
+FIXACAO INNER JOIN:
+
+    SELECT 
+        act.actor_id, act.first_name, film.film_id
+    FROM
+        sakila.actor AS act
+            INNER JOIN
+        sakila.film_actor AS film
+    ON act.actor_id = film.actor_id;
+
+    SELECT 
+        S.first_name, S.last_name, A.address
+    FROM
+        sakila.staff AS S
+            INNER JOIN
+        sakila.address AS A
+    ON S.address_id = A.address_id;
+
+    SELECT 
+        C.customer_id,
+        C.first_name,
+        C.email,
+        C.address_id,
+        A.address
+    FROM
+        sakila.customer AS C
+            INNER JOIN
+        sakila.address AS A
+    ON C.address_id = A.address_id ORDER BY C.first_name DESC LIMIT 100;
+
+    SELECT 
+        C.first_name, COUNT(A.address)
+    FROM
+        sakila.customer AS C
+            INNER JOIN
+        sakila.address AS A ON C.address_id = A.address_id
+    WHERE C.active = 1
+    GROUP BY C.first_name
+    ORDER BY C.first_name DESC;
+
+    SELECT ST.first_name, ST.last_name, AVG(P.amount) FROM sakila.staff AS ST
+    INNER JOIN sakila.payment AS P
+    ON ST.staff_id = P.staff_id
+    WHERE YEAR(P.payment_date) = 2006
+    GROUP BY ST.first_name, ST.last_name;
+
+EX com dois inner joins: 
+    SELECT 
+        A.actor_id, A.first_name, FA.film_id, F.title
+    FROM
+        sakila.actor AS A
+    INNER JOIN sakila.film_actor AS FA ON A.actor_id = FA.actor_id
+    INNER JOIN sakila.film AS F ON F.film_id = FA.film_id;
+
+
+*LEFT JOIN e o RIGHT JOIN*
+
+    sintaxe LEFT JOIN:
+    SELECT C.customer_id, C.first_name, A.actor_id
+    FROM sakila.customer AS C
+    LEFT JOIN sakila.actor AS A
+    ON C.last_name = A.last_name;
+
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        a.actor_id,
+        a.first_name,
+        a.last_name
+    FROM sakila.customer AS c
+    LEFT JOIN sakila.actor AS a
+    ON c.last_name = a.last_name
+    ORDER BY c.last_name;
+
+    sintaxe RIGHT JOIN:    
+    SELECT C.customer_id, C.first_name, A.actor_id
+    FROM sakila.customer AS C
+    RIGHT JOIN sakila.actor AS A
+    ON C.last_name = A.last_name;
+
+    SELECT
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        a.actor_id,
+        a.first_name,
+        a.last_name
+    FROM sakila.customer AS c
+    RIGHT JOIN sakila.actor AS a
+    ON c.last_name = a.last_name
+    ORDER BY c.last_name;
+
+
+Notando as diferenças
+Depois de ter analisado as queries acima, note que, de fato, a única diferença entre os três joins é a questão do foco.
+
+LEFT JOIN : quando utilizamos o LEFT JOIN , focamos a tabela da esquerda. São retornados todos os registros da tabela esquerda e valores correspondentes da tabela da direita, caso existam . Valores que não possuem correspondentes são exibidos como nulos.
+
+RIGHT JOIN : quando utilizamos o RIGHT JOIN , focamos a tabela da direita. São retornados todos os registros da tabela da direita e valores correspondentes da tabela da esquerda, caso existam . Valores que não possuem correspondentes são exibidos como nulos.
+
+INNER JOIN : finalmente, temos o INNER JOIN , que foca em trazer somente os registros que possuem valores correspondentes em ambas as tabelas .
+
+
+*SELF JOIN*
+
+    Sintaxe:
+    SELECT t1.title, t1.replacement_cost, t2.title, t2.replacement_cost
+    FROM sakila.film AS t1, sakila.film AS t2
+    WHERE t1.length = t2.length;
+
+FIXACAO SELF JOIN
+
+    SELECT 
+        T1.film_id, T1.replacement_cost, T2.film_id, T2.replacement_cost
+    FROM
+        sakila.film AS T1,
+        sakila.film AS T2
+    WHERE
+        T1.replacement_cost = T2.replacement_cost;
+
+    SELECT 
+        T1.title, T1.rental_duration, T2.title, T2.rental_duration
+    FROM
+        sakila.film AS T1,
+        sakila.film AS T2
+    WHERE
+        T1.length = T2.length
+            AND T1.rental_duration BETWEEN 2 AND 4;
+
+
+*Como unir resultados com o UNION e o UNION ALL*
+
+    UNION - Une as tabelas e retira todos os resultados repetidos nas duas tabelas
+    UNION ALL - Une as tabelas sem retirar as repeticoes 
+
+    Sintaxe:
+    (SELECT first_name, last_name FROM sakila.actor)
+    UNION OU UNION ALL
+    (SELECT first_name, last_name FROM sakila.customer);
+
+    Outro Ex:
+    (SELECT first_name, last_name, '-' AS 'customer_id' FROM sakila.actor LIMIT 20)
+    UNION ALL
+    (SELECT first_name, last_name, customer_id FROM sakila.customer LIMIT 20)
+    ORDER BY first_name
+    LIMIT 10 OFFSET 10;
+
+
+FIXACAO UNION:
+
+    (SELECT first_name, last_name FROM sakila.staff)
+        UNION ALL
+    (SELECT first_name, last_name FROM sakila.actor);
+
+    /////
+
+    (SELECT first_name FROM sakila.customer WHERE first_name LIKE '%tracy%')
+        UNION
+    (SELECT first_name FROM sakila.actor WHERE first_name LIKE '%je%');
+
+    /////
+
+    (SELECT first_name FROM sakila.actor ORDER BY first_name DESC LIMIT 5)
+        UNION ALL
+    (SELECT first_name FROM sakila.staff LIMIT 1)
+	    UNION ALL
+    (SELECT first_name FROM sakila.customer LIMIT 5 OFFSET 15)
+    ORDER BY first_name;
+
+    /////
+
+    (SELECT first_name, last_name FROM sakila.actor)
+        UNION ALL
+    (SELECT first_name, last_name FROM sakila.customer)
+    ORDER BY first_name ASC LIMIT 15 OFFSET 45;
+
+
+
+*Como utilizar uma SUBQUERY*
+
+Diferentes maneiras de utilizar uma SUBQUERY
+
+    Usando uma SUBQUERY como fonte de dados para o FROM:
+    SELECT f.title, f.rating
+    FROM (
+        SELECT *
+        FROM sakila.film
+        WHERE rating = 'R'
+    ) AS f;
+
+    /////
+
+    Preenchendo uma coluna de um SELECT por meio de uma SUBQUERY:
+    SELECT
+        address,
+        district,
+        (
+            SELECT city
+            FROM sakila.city
+            WHERE city.city_id = sakila.address.city_id
+        ) AS city
+    FROM sakila.address;
+
+    /////
+
+    Filtrando resultados com WHERE usando como base os dados retornados de uma SUBQUERY:
+    SELECT address, district
+    FROM sakila.address
+    WHERE city_id IN (
+        SELECT city_id
+        FROM sakila.city
+        WHERE city in ('Sasebo', 'San Bernardino', 'Athenai', 'Myingyan')
+    );
+
+    /////
+
+    Usando uma tabela externa, de fora da SUBQUERY , dentro dela:
+    SELECT
+        first_name,
+        (
+            SELECT address
+            FROM sakila.address
+            WHERE address.address_id = tabela_externa.address_id
+        ) AS address
+    FROM sakila.customer AS tabela_externa;
+
+
+*EXISTS*
+
+O intuito principal do EXISTS é Retornar os registros da tabela A que possuem um relacionamento com os registros da tabela B.
+
+    Sintaxe:
+    SELECT * FROM hotel.customers AS C
+    WHERE EXISTS (
+        SELECT * FROM hotel.reservations
+        WHERE C.CustomerID = reservations.CustomerID
+    );
+    OBS: podemos utilizar o NOT EXISTS para a negacao.
+
+FIXACAO EXISTS:
+
+    SELECT 
+        Id, Title
+    FROM
+        hotel.Books AS B
+    WHERE
+        NOT EXISTS( 
+        SELECT book_id
+	    FROM hotel.Books_Lent
+	    WHERE B.Id = book_id
+    );
+
+    SELECT 
+        Id, Title
+    FROM
+        hotel.Books AS B
+    WHERE
+        EXISTS( 
+        SELECT book_id
+	    FROM hotel.Books_Lent
+	    WHERE B.Id = book_id
+    ) AND Title LIKE '%lost%';
+
+    SELECT Name FROM hotel.Customers AS C
+    WHERE NOT EXISTS (
+	    SELECT * 
+        FROM hotel.CarSales 
+        WHERE C.CustomerId = CarSales.CustomerID
+    );
+
+    SELECT Cus.`Name`, Car.`Name` 
+    FROM hotel.Customers AS Cus
+    INNER JOIN hotel.Cars AS Car
+    WHERE EXISTS (
+	    SELECT * 
+        FROM hotel.CarSales 
+        WHERE Cus.CustomerId = CarSales.CustomerID
+        AND CarID = Car.Id
+    );
+
+
