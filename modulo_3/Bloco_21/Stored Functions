@@ -1,0 +1,171 @@
+** Stored Functions **
+
+Stored functions podem ser executadas com o comando SELECT . Ao criá-las, temos que definir o tipo de retorno que sua função possui.
+
+Tipos de retorno comuns:
+
+    DETERMINISTIC - Sempre retorna o mesmo valor ao receber os mesmos dados de entrada;
+    READS SQL DATA - Indica para o MySQL que sua função somente lerá dados.
+
+Em muitas situações, sua function estará apenas lendo e retornando dados. Nesses casos, a opção READS SQL DATA deve ser usada. No entanto, sempre avalie o tipo mais adequado à sua função.
+
+
+
+*Estrutura padrão de uma stored function*
+
+    USE banco_de_dados; -- obrigatório para criar a função no banco correto
+    DELIMITER $$
+
+    CREATE FUNCTION nome_da_function(parametro1, parametro2, ..., parametroN)
+    RETURNS tipo_de_dado tipo_de_retorno
+    BEGIN
+        query_sql
+        RETURN resultado_a_ser_retornado;
+    END $$
+
+    DELIMITER ;
+
+Exemplo de uma stored function que exibe a quantidade de filmes em que um determinado ator ou atriz atuou:
+
+    USE sakila;
+    DELIMITER $$
+
+    CREATE FUNCTION MoviesWithActor(actor_id INT)
+    RETURNS INT READS SQL DATA
+    BEGIN
+        DECLARE movie_total INT;
+        SELECT COUNT(*)
+        FROM sakila.film_actor
+        WHERE sakila.film_actor.actor_id = actor_id INTO movie_total;
+        RETURN movie_total;
+    END $$
+
+    DELIMITER ;
+
+    -- Como usar:
+
+    SELECT MoviesWithActor(1);
+
+
+Exemplo de uma stored function que exibe o nome completo de um ator ou de uma atriz, dado seu id como parâmetro:
+
+    USE sakila;
+    DELIMITER $$
+
+    CREATE FUNCTION GetFullName(id INT)
+    RETURNS VARCHAR(200) READS SQL DATA
+    BEGIN
+        DECLARE full_name VARCHAR(200);
+        SELECT concat(first_name, ' ', last_name)
+        FROM sakila.actor
+        WHERE actor_id = id
+        LIMIT 1
+        INTO full_name ;
+        RETURN full_name;
+    END $$
+
+    DELIMITER ;
+
+    SELECT GetFullName(51);
+
+
+Ex:
+    USE soccer_players;
+    DELIMITER $$
+    CREATE FUNCTION RetornaMediaDeUmTimePorPosicao(selectedTeam VARCHAR(50), selectedPosition VARCHAR(3))
+    RETURNS DOUBLE READS SQL DATA
+    BEGIN
+        DECLARE average DOUBLE;
+        SELECT AVG(overall)
+            FROM player
+            WHERE team = selectedTeam AND position LIKE CONCAT('%', selectedPosition,'%')
+            INTO average;
+        RETURN average;
+    END $$
+
+    DELIMITER ;
+
+COMO USAR:
+
+    SELECT RetornaMediaDeUmTimePorPosicao('Flamengo', 'GK');    
+    SELECT RetornaMediaDeUmTimePorPosicao('Real Madrid', 'GK') INTO @gkAverage;
+
+
+FIXACAO FUNCTIONS:
+
+    USE sakila;
+    DELIMITER $$
+
+    CREATE FUNCTION RetornaQuantidadeDePagamentos(customerID INT)
+    RETURNS INT READS SQL DATA
+    BEGIN
+	    DECLARE quantidadeDePagamentos INT;
+	    SELECT COUNT(customer_id) FROM payment
+        WHERE customer_id = customerID
+        INTO quantidadeDePagamentos ;
+        RETURN quantidadeDePagamentos;
+    END $$
+
+    DELIMITER ;
+
+    como usar:
+
+    SELECT RetornaQuantidadeDePagamentos(4);
+
+    /////
+
+    USE sakila;
+    DELIMITER $$
+
+    CREATE FUNCTION RetornaNomeDoFilmePeloID(inventoryID INT)
+    RETURNS VARCHAR(700) READS SQL DATA
+    BEGIN
+	    DECLARE filmeRetornado VARCHAR(700);
+	    SELECT F.title FROM film AS F
+        INNER JOIN inventory AS I
+        ON F.film_id = I.film_id
+        WHERE inventoryID = I.film_id
+        INTO filmeRetornado ;
+        RETURN filmeRetornado;
+    END $$
+
+    DELIMITER ;
+
+    como usar:    
+
+    SELECT RetornaNomeDoFilmePeloID(5);
+
+    /////
+
+    USE sakila;
+    DELIMITER $$
+    CREATE FUNCTION RetornaQuantidadeDeFilmesPorCategoria(categoria VARCHAR(200))
+    RETURNS INT READS SQL DATA
+    BEGIN
+	    DECLARE QuantidadeDeFilmes INT;
+        SELECT COUNT(*) 
+        FROM film_category AS FC
+        INNER JOIN category AS C
+        ON FC.category_id = C.category_id
+        WHERE C.`name` = categoria
+        INTO QuantidadeDeFilmes;
+        RETURN QuantidadeDeFilmes;
+    END $$
+
+    DELIMITER ;
+
+    cono usar:
+
+    SELECT RetornaQuantidadeDeFilmesPorCategoria('Action');
+
+    /////
+
+
+
+DIFERENCAS ENTRE Stored Procedures E Stored Functions
+    Stored Procedures podem ser chamadas através do comando CALL , e o retorno de um valor é opcional;
+    Já as Stored Functions são executadas com o comando SELECT e obrigatoriamente retornam algum valor;
+    A Stored Functions não pode ser utilizada para alterar o estado global da base dados. (Ex. Por meio das instruções INSERT , UPDATE e DELETE );
+    Stored Procedures permite alterar o estado global.
+    Stored Procedures permitem realizar o tratamento de excepções, via try/catch .
+
