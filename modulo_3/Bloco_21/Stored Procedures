@@ -76,7 +76,7 @@ Exemplo1 - Procedure sem parâmetros:
 Exemplo2 - Procedure com parâmetros de entrada (IN):
 
     USE soccer_players;
-    DELIMITER $$;
+    DELIMITER $$
     
     CREATE PROCEDURE SelecionarJogadoresComNotaMaiorQue(IN nota NUMERIC)
     BEGIN

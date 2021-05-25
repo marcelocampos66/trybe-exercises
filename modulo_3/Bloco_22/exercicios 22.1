@@ -1,0 +1,108 @@
+1 - EXERCICIO 1
+
+    CREATE SCHEMA IF NOT EXISTS Catalog_Album;
+    USE Catalog_Album;
+
+    CREATE TABLE artist(
+	    artist_id INT PRIMARY KEY AUTO_INCREMENT,
+        artist_name VARCHAR(100) NOT NULL
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE genre(
+	    genre_id INT AUTO_INCREMENT,
+        genre_name VARCHAR(100) NOT NULL,
+        CONSTRAINT PRIMARY KEY(genre_id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE record (
+        record_id INT AUTO_INCREMENT,
+        record_name VARCHAR(100) NOT NULL,
+        CONSTRAINT PRIMARY KEY (record_id)
+    )  ENGINE=INNODB;
+
+    CREATE TABLE album(
+	    album_id INT AUTO_INCREMENT,
+        album_name VARCHAR(100) NOT NULL,
+        release_year INT NOT NULL,
+        rating DECIMAL(2,1),
+	    artist_id INT NOT NULL,
+        genre_id INT NOT NULL,
+	    record_id INT NOT NULL,
+        CONSTRAINT PRIMARY KEY(album_id),
+        FOREIGN KEY (artist_id) REFERENCES artist (artist_id),
+        FOREIGN KEY (genre_id) REFERENCES genre (genre_id),
+        FOREIGN KEY (record_id) REFERENCES record (record_id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE musics(
+	    music_id INT AUTO_INCREMENT,
+        music_name VARCHAR(100) NOT NULL,
+        album_id INT NOT NULL,
+        CONSTRAINT PRIMARY KEY(music_id),
+        FOREIGN KEY (album_id) REFERENCES album (album_id)
+    ) ENGINE=InnoDB;
+
+
+3 - Um zoológico precisa de um banco de dados para armazenar informações sobre os seus animais. As informações a serem armazenadas sobre cada animal são:
+
+    Nome;
+    Espécie;
+    Sexo;
+    Idade;
+    Localização;
+
+Cada animal também possui vários cuidadores, e cada cuidador pode ser responsável por mais de um animal. Além disso, cada cuidador possui um gerente, sendo que cada gerente pode ser responsável por mais de um cuidador. Siga os passos aprendidos no dia de hoje para modelar essa base de dados.
+
+Entidades:
+
+    1 - Especie
+    2 - Gerente
+    3 - Cuidador
+    4 - Localizacao
+
+Atributos:
+
+    Gerente - manager_id, name.
+    Localizacao - location_id, name   
+    Cuidador - employee_id, name, manager_id
+    Animal - animal_id, animal_name, especie_name, age, gender, location_id.
+    Cuidador & Animal - animal_id, employee_id
+
+Script
+
+    CREATE DATABASE IF NOT EXISTS zoo_functions;
+    USE zoo_functions;
+    CREATE TABLE manager(
+	    manager_id INT PRIMARY KEY AUTO_INCREMENT,
+        `name` VARCHAR(100) NOT NULL
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE locations(
+	    location_id INT PRIMARY KEY AUTO_INCREMENT,
+        `name` VARCHAR(100) NOT NULL
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE employees(
+	    employee_id INT PRIMARY KEY AUTO_INCREMENT,
+        `name` VARCHAR(100) NOT NULL,
+        manager_id INT NOT NULL,
+        FOREIGN KEY (manager_id) REFERENCES manager (manager_id)
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE animal(
+	    animal_id INT PRIMARY KEY AUTO_INCREMENT,
+        animal_name VARCHAR(100) NOT NULL,
+        especie_name VARCHAR(100) NOT NULL,
+        age DECIMAL(5,2) NOT NULL,
+        gender VARCHAR(1),
+        location_id INT NOT NULL
+    ) ENGINE=InnoDB;
+
+    CREATE TABLE employee_animal(
+	    animal_id INT NOT NULL,
+        employee_id INT NOT NULL,
+        FOREIGN KEY (animal_id) REFERENCES animal (animal_id),
+        FOREIGN KEY (employee_id) REFERENCES employees (employee_id),
+        CONSTRAINT PRIMARY KEY (animal_id, employee_id)
+    ) ENGINE=InnoDB;
+
