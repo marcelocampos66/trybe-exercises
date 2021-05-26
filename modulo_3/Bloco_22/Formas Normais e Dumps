@@ -1,0 +1,183 @@
+*NORMALIZACAO*
+
+    As tabelas devem ser escaláveis (preparadas para grandes quantidades de dados)
+    As tabelas devem ser extensiveis (mudanças nao devem quebrar a integridade dos dados)
+
+    Acabar com os dados repetidos
+    Melhorar a integridade dos dados
+
+1ª Forma Normal
+
+Para iniciar a organização de um banco de dados, devemos nos atentar para a primeira forma normal - base de todas as outras. Seus preceitos são:
+
+    - Colunas devem possuir apenas um valor
+    - Valores em uma coluna devem ser do mesmo tipo de dados
+    - Cada coluna deve possuir um nome único
+    - A ordem dos dados registrados em uma tabela não deve afetar a integridade dos dados
+
+/////
+
+2ª Forma Normal
+
+Para a Segunda Forma Normal , devemos atentar para o seguinte:
+
+    - A tabela deve estar na 1ª Forma Normal
+    - A tabela não deve possuir dependências parciais
+
+Uma dependência parcial pode ser considerada como qualquer coluna que não depende exclusivamente da chave primária da tabela para existir.
+
+id	nome	data_matricula	curso
+1	Samuel	2020-09-01	    Física
+2	Joana	2020-08-15	    Biologia
+3	Taís	2020-07-14	    Contabilidade
+4	André	2020-06-12	    Biologia
+
+A coluna curso pode ser considerada uma dependência parcial pois poderiámos mover os valores dessa coluna para uma outra tabela e os dados dessa tabela podem existir independente de existir uma pessoa estudante vinculada a esse curso ou não. Dessa forma depois de normalizar teríamos duas tabelas:
+
+Cursos
+id	nome
+1	Física
+2	Biologia
+3	Contabilidade
+
+Pessoas Estudantes
+id	nome	data_matricula	curso_id
+1	Samuel	2020-09-01	    1
+2	Joana	2020-08-15	    2
+3	Taís	2020-07-14	    3
+4	André	2020-06-12	    2
+
+Dessa forma, aplicamos a segunda forma normal na tabela Pessoas Estudantes . Lembre-se que a função da normalização não é necessariamente reduzir o número de colunas mas remover redundâncias e possíveis anomalias de inclusão/alteração ou remoção.
+
+/////
+
+3ª Forma Normal
+
+Por fim, a Terceira Forma Normal estabelece que:
+
+    - A tabela deve estar na 1ª e 2ª Formas Normais;
+    - A tabela não deve conter atributos (colunas) que não sejam totalmente dependentes na PK (chave primária).
+
+
+livro_id    categoria_id    valor
+1           1               29
+2           2               34
+3           3               19
+
+categoria_id    categoria
+1               Romance
+2               Policial
+3               Ficção
+
+/////
+
+FIXACAO Formas Normais
+
+1. Exercícios Pré-Aula
+
+    CREATE SCHEMA IF NOT EXISTS normalization;
+    USE normalization;
+
+    CREATE TABLE sectors(
+	    sector_id INT PRIMARY KEY AUTO_INCREMENT,
+        sector VARCHAR(50) NOT NULL
+    ) ENGINE=InnoDB;
+
+    INSERT INTO sectors (
+	    sector_id,
+        sector
+    ) VALUES 
+	    (1,'Administração'),
+	    (2,'Vendas'),
+	    (3,'Operacional'),
+	    (4,'Estratégico'),
+	    (5,'Marketing');
+
+    CREATE TABLE employees(
+	    employees_id INT PRIMARY KEY AUTO_INCREMENT,
+        first_name VARCHAR(50) NOT NULL,
+        last_name VARCHAR(20) NOT NULL,
+        email VARCHAR(50) NOT NULL,
+        telephone VARCHAR(15),
+        registration_date DATETIME NOT NULL
+    ) ENGINE=InnoDB;
+
+    INSERT INTO employees (
+	    employees_id,
+        first_name,
+        last_name,
+        email,
+        telephone,
+        registration_date
+    ) VALUES 
+	    (12,'Joseph', 'Rodrigues', 'jo@gmail.com', '(35)998552-1445', '2020-05-05 08:50:25'),
+	    (13,'Andre', 'Freeman', 'andre1990@gmail.com', '(47)99522-4996', '2020-02-05 00:00:25'),
+	    (14,'Cintia', 'Duval', 'cindy@outlook.com', '(33)99855-4669', '2020-05-05 10:55:35'),
+	    (15,'Fernanda', 'Mendes', 'fernandamendes@yahoo.com', '(33)99200-1556', '2020-05-05 11:45:40');
+
+    CREATE TABLE sector_mapping(
+	    employees_id INT,
+        sector_id INT,
+        CONSTRAINT PRIMARY KEY (employees_id, sector_id),
+        FOREIGN KEY (employees_id) REFERENCES employees (employees_id),
+	    FOREIGN KEY (sector_id) REFERENCES sectors (sector_id)
+    ) ENGINE=InnoDB;
+
+    INSERT INTO sector_mapping (
+	    employees_id,
+        sector_id
+    ) VALUES 
+	    (12,1),
+	    (12,2),
+	    (13,3),
+	    (14,4),
+        (14,2),
+	    (15,5);
+
+/////
+
+
+**DUMP**
+
+Um dump (despejo, em português), no contexto de banco de dados, é o ato de pegar o esquema do banco de dados (estrutura de tabelas, banco de dados e suas restrições) e, opcionalmente, também os dados de cada uma dessas tabelas e salvá-las em arquivos de texto, geralmente na forma de instruções SQL .
+O intuito desse processo é possibilitar que esses arquivos SQL sejam utilizados em algum outro lugar.
+
+*Para exportar schema e/ou dados, siga as instruções abaixo:*
+
+    1 - Escolha quais bancos de dados devem ser incluídos no backup;
+    2 - Escolha quais tabelas deve ser incluídas no backup;
+    3 - Escolha se Stored Procedures e Stored Functions devem ou não ser incluídas;
+    4 - Escolha se gostaria de exportar apenas estrutura ( Structure Only ), apenas os dados ( Data Only ) ou ambos ( Structure and Data );
+    5 - Escolha se gostaria de incluir os triggers no arquivo de backup;
+    6 - Escolha se gostaria de incluir o esquema (código para criar banco de dados. Ex.: CREATE DATABASE );
+    7 - Selecione o local para onde exportar o arquivo.
+
+Feito isso, basta clicar no botão Start Export.
+
+
+*Restaurando um banco de dados a partir de um dump com o MySQL Workbench*
+
+O modo mais simples de restaurar um dump é executá-lo como um script dentro do MySQL Workbench , algo que você já fez algumas vezes nos dias anteriores.
+
+    1 - Abra o MySQL Workbench .
+    2 - Vá até File -> Open SQL Script
+    3 - Navegue até o local onde o arquivo de dump foi salvo.
+    4 - Execute o script SQL clicando no botão com formato de trovão
+
+
+*DUMP Via Comandos*
+
+show databases; -- para ver todas as DBs
+use aulaDB; -- para usar essa DB
+show tables; -- para ver as tabelas
+select * from nome_da_tabela; -- mostrar os dados das tabelas
+
+Fazer o DUMP
+mysqldump -u root -p banco_de_dados > backuBancoDeDados.sql -- recupera todo o DB (Dados e estrutura)
+mysqldump -u root -p --no-data banco_de_dados > backuBancoDeDadosSemDados.sql --recupera apenas a estrutura
+
+
+Com o terminal aberto na pasta do arquivo
+mysqldump -u root -p banco_de_dados < backuBancoDeDados.sql -- restaura todo o conteudo do backup dentro de uma DB vazia, no caso, a DB banco_de_dados.
+
+
