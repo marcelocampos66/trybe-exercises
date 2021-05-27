@@ -1,0 +1,193 @@
+**Transformando ideias em um modelo de banco de dados - Parte 2**
+
+*Clonar tabelas existentes*
+
+Para clonar uma tabela, é preciso fazer apenas um comando:
+
+    -- Sintaxe:
+    CREATE TABLE nome_para_nova_tabela LIKE tabela_a_ser_clonada;
+
+    -- Exemplo:
+    CREATE TABLE actor_clone LIKE sakila.actor;
+
+Ao fazer isso, você terá criado uma tabela com a estrutura exatamente igual (chave primária, chave estrangeira, tipos, restrições etc.) usando apenas uma linha de código!
+
+Pontos de Atenção:
+
+    Esse comando não copia os dados, apenas a estrutura;
+    Caso não especifique qual banco de dados utilizar, a nova tabela será inserida no banco que estiver ativo no momento da execução. Sendo assim, sempre especifique o banco de dados antes.
+
+    USE nome_do_banco_de_dados;
+    CREATE TABLE nome_para_nova_tabela LIKE tabela_a_ser_clonada;
+
+para copiar os dados da tabela(usando a query do Exemplo):
+
+    INSERT INTO actor_copia (SELECT * FROM sakila.actor);
+
+
+*O que é e como lidar com uma VIEW*
+
+Uma VIEW é nada mais nada menos que uma tabela temporária no seu banco de dados, que pode ser consultada como qualquer outra. Porém, por ser uma tabela temporária, ela é criada a partir de uma query que você definir.
+
+Uma VIEW te permite:
+
+    - Ter uma tabela que pode ser usada em relatórios;
+    - Ter uma tabela para usar como base para montar novas queries;
+    - Reduzir a necessidade de recriar queries utilizadas com frequência.
+
+Sintaxe:
+
+    -- Defina em qual banco a view será criada
+    USE nome_do_banco_de_dados;
+    -- Comando para criar a view
+    CREATE VIEW nome_da_view AS query;
+
+
+Exemplo
+Suponha que a gerência quer ter uma maneira simples para sempre saber quem são os top 10 clientes que mais compram com a empresa.
+
+    CREATE VIEW top_10_customers AS
+        SELECT c.customer_id, c.first_name, SUM(p.amount) AS total_amount_spent
+        FROM sakila.payment p
+        INNER JOIN sakila.customer c ON p.customer_id = c.customer_id
+        GROUP BY customer_id
+        ORDER BY total_amount_spent DESC
+        LIMIT 10;
+
+Caso alguém precise ter acesso a essa informação, você pode consultar a tabela temporária ( VIEW ) diretamente, sem a necessidade de montar uma nova query.
+
+    SELECT * FROM top_10_customers;
+
+Para excluir uma VIEW , use o seguinte comando:
+
+    DROP VIEW nome_da_view;
+
+
+*ALTER TABLE*
+
+Usando essa nova table como exemplo:
+
+    USE sakila;
+    CREATE TABLE noticia(
+        noticia_id INT PRIMARY KEY,
+        titulo VARCHAR(100),
+        historia VARCHAR(300)
+    ) engine = InnoDB;
+
+Abaixo, algumas das alterações que podem ser feitas em uma tabela.
+
+    -- Adicionar uma nova coluna
+    ALTER TABLE noticia ADD COLUMN data_postagem DATE NOT NULL;
+
+    -- Modificar o tipo e propriedades de uma coluna
+    ALTER TABLE noticia MODIFY noticia_id BIGINT;
+
+    -- Adicionar incremento automático a uma coluna
+    -- (especifique o tipo da coluna + auto_increment)
+    ALTER TABLE noticia MODIFY noticia_id BIGINT AUTO_INCREMENT;
+
+    -- Alterar o tipo e nome de uma coluna
+    ALTER TABLE noticia CHANGE historia conteudo_postagem VARCHAR(1000) NOT NULL;
+
+    -- Dropar/Excluir uma coluna
+    ALTER TABLE noticia DROP COLUMN data_postagem;
+
+    -- Adicionar uma nova coluna após outra
+    ALTER TABLE noticia ADD COLUMN data_postagem DATETIME NOT NULL AFTER titulo;
+
+Com os comandos acima, foram cobertas as operações mais comuns que você deve saber para alterar uma tabela.
+Para confirmar se a estrutura da sua tabela foi alterada corretamente, você pode usar o comando:
+
+    SHOW COLUMNS FROM nome_da_tabela;
+
+
+*DROPando uma tabela*
+
+Para excluir uma tabela existente, você pode utilizar o comando DROP TABLE.
+
+    DROP TABLE nome_da_tabela;
+
+Ponto Importante
+    
+    Você não conseguirá dropar (excluir) uma tabela que é referenciada por uma restrição de chave estrangeira. A chave estrangeira ou a tabela que a contém deve ser excluída antes.
+
+
+
+*Como usar um INDEX*
+
+Quando se fala em otimização de queries, o termo índice (ou INDEX ) pode vir a ser mencionado como solução para problemas de performance.
+
+Eh uma maneira de estruturar os dados de forma mais eficiente para que seja encontrados rapidamente.
+
+Tipos de INDEX:
+
+    - PRIMARY KEY
+    - UNIQUE
+    - INDEX
+    - FULLTEXT INDEX
+
+    SELECT * FROM sakila.address WHERE MATCH(address) AGAINST('drive');
+
+Criando o INDEX depois que uma tabela ja foi criada:
+
+    CREATE INDEX nome_index ON tabela(coluna);
+    CREATE FULLTEXT INDEX nome_index ON tabela(coluna);
+
+Criando o INDEX ao criar a nossa tabela:
+
+    CREATE DATABASE IF NOT EXISTS pizzaria;
+    USE pizzaria;
+
+    CREATE TABLE pizzas(
+        pizza_id INT PRIMARY KEY,
+        sabor VARCHAR(100),
+        preco DECIMAL(5,2),
+        INDEX sabor_index(sabor)
+    ) ENGINE=InnoDB;
+
+Criando o INDEX alterarando uma tabela:
+
+    ALTER TABLE nome_da_tabela ADD INDEX nome_index(nome_coluna);
+
+PONTOS POSITIVOS:
+
+    - Acelera as Queries SELECT;
+    - Permite tornar uma coluna com valores unicos (UNIQUE);
+    - Permite buscar em grandes pedacos de textos (FULLTEXT INDEX);
+    - Aceleram as operacoes de update que usam WHERE;
+
+PONTOS NEGATIVOS:
+
+    - Ocupam espaco em disco
+    - Tornam lentas as operacoes de INSERT, UPDATE e DELETE, porque cada INDEX precisa ser atualizado junto com os dados
+
+EXCLUINDO O INDEX:
+
+    DROP INDEX index_first_name ON sakila.actor;
+
+Sintaxe:
+
+    -- Criando um índice em uma coluna
+    CREATE [INDEX | FULLTEXT INDEX | UNIQUE INDEX] nome_indice
+    ON tabela (coluna);
+
+    -- Criando um índice composto, em duas ou mais colunas
+    CREATE [INDEX | FULLTEXT INDEX | UNIQUE INDEX] nome_indice
+    ON tabela (coluna1, coluna2);
+
+    -- Excluindo índices
+    DROP INDEX nome_do_indice ON tabela;
+
+
+
+*Quando não utilizar índices*
+
+Mesmo notando que os resultados foram favoráveis para o uso de índices nesses exemplos, é importante ressaltar que eles nem sempre devem ser utilizados. Abaixo, segue uma lista das situações em que o uso de índices deve ser evitado:
+
+    - Em tabelas pequenas, pois a diferença de performance será mínima, se houver;
+    - Em colunas que retornarão uma grande quantidade dados quando filtradas. Por exemplo, você não adicionaria os artigos "o" e "a" ao índice de um livro;
+    - Em tabelas que frequentemente têm atualizações em grande escala, uma vez que a performance dessas atualizações será afetada;
+    - Em colunas que são frequentemente manipuladas, haja vista que a manutenção do índice dessa coluna pode demandar muito tempo quando feita em excesso;
+    - Em colunas que possuem muitos valores nulos.
+
+
