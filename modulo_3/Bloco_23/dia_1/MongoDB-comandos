@@ -1,0 +1,337 @@
+**COMANDOS**
+
+Conecta ao MongoDB
+    mongo
+
+Mostra todos os databases
+    show dbs
+
+Usa ou cria a DB
+    use nomeDaDb
+
+Mostra todas as collections
+    show collections
+
+Desconecta do MongoDB
+    exit
+
+
+*Bancos de Dados, Coleções e Documentos*
+
+A estrutura de armazenamento do MongoDB consiste em:
+
+    - ter diversos bancos de dados;
+    - dentro destes bancos temos as coleções (que seriam equivalentes às tabelas dos bancos de dados relacionais);
+    - dentro destas coleções temos os documentos (que seriam equivalentes aos registros dos bancos de dados relacionais).
+
+*Coleções*
+
+Como citado anteriormente, os documentos no MongoDB são armazenados dentro das coleções . Lembrando que uma coleção é equivalente à uma tabela dos bancos de dados relacionais.
+
+Criando uma coleção
+Como você viu, se uma coleção não existe, o MongoDB cria essa coleção no momento do primeiro insert.
+
+    db.nomeDaColecao1.insertOne({ x: 1 })
+    db.nomeDaColecao2.createIndex({ y: 1 })
+
+Veja que tanto as operações insertOne() e createIndex() criam uma nova coleção (caso ela não exista).
+
+Criação explícita
+
+Você também pode utilizar o método db.createCollection() para criar uma coleção e especificar uma série de parâmetros, como o tamanho máximo do documento ou as regras de validação para os documentos .
+Se você não quiser especificar algum desses parâmetros, o uso do método para criação não é necessário. O exemplo abaixo cria uma coleção, especificando sua collation.
+
+    db.createCollection( "nomeDaColecao", { collation: { locale: "pt" } } );
+
+
+*Documentos*
+
+Como dito, os documentos são equivalentes aos registros ou linhas de uma tabela nos bancos de dados relacionais. Além disso, cada atributo (campo) é equivalente a uma coluna de uma linha da tabela. Sua diferença é que documentos podem conter estruturas mais ricas, diferentes entre documentos, e armazenar muito mais informações do que você consegue em uma "linha simples" de uma tabela relacional. Abaixo, temos uma representação de um registro numa tabela relacional, e também o seu correspondente em um documento:
+
+    id  nome    endereco    cidade          uf
+    1   Jose    Rua 1       Sao Paulo       SP
+    2   Maria   Rua 2       Belo Horizonte  MG
+
+Em documento:
+
+    {
+        "_id": 1,
+        "nome": "Jose",
+        "endereco": {
+            "logradouro": "Rua 1",
+            "regiao": "Zona Norte",
+            "cidade": "São Paulo",
+            "uf": "SP"
+        }
+    },
+    {
+        "_id": 2,
+        "nome": "Maria",
+        "endereco": {
+            "logradouro": "Rua 2",
+            "cidade": "Belo Horizonte",
+            "uf": "MG"
+        }
+    }
+
+Como você viu acima, um insert recebe como parâmetro um JSON . Esse parâmetro define os dados e a estrutura do documento. É importante ressaltar que, por ser schemaless , ou seja, sem esquema por padrão, a estrutura não faz parte da coleção, e sim do documento . Com isso, você pode ter várias "estruturas" por coleção. No exemplo acima, podemos observar essa diferença entre os documentos. No primeiro, temos o atributo regiao , que não existe no segundo documento.
+Quando você fizer uma alteração, faça-a em nível de documento. Pois caso você a faça em nível de coleção, muitos documentos com estruturas diferentes poderão ser impactados com a criação, alteração ou remoção de um atributo que não faz parte da estrutura de todos.
+
+*USE*
+
+Seleciona um banco de dados caso ele exista, ou no caso de nao existir, ira cria-lo a partir da primeira insercao de dados.
+
+    use nomeDoBancoDeDados
+
+
+*INSERT*
+
+Os métodos insertOne() e insertMany() têm suas particularidades e limitações. Enquanto um faz a inserção de um único documento por vez, o outro pode inserir milhares de documentos em uma única operação. Portanto, saber quando e onde aplicar fará toda a diferença quando você estiver codificando.
+
+insertOne()
+
+Sintaxe:
+
+    use nomeDoBancoDeDados -- para selecionar o banco de dados
+
+    db.nomeDaCollection.insertOne({nome: "Fusca", preco: 2000});
+
+com o comando acima, o mongoDB ira criar uma id automagicamente, caso queira criar essa id manualmente a sintaxe eh a seguinte:
+
+    db.carros.insertOne({_id: 1, nome: "Camaro", preco: 250000});
+
+
+insertMany()
+
+Sintaxe:
+
+    db.nomeDoDB.insertMany([
+        { "productName": "Lapis", "stock": 10, "price": 20,"status":"A"},
+        { "productName": "Tesoura", "price": 5, "status": "B" },
+        { "productName": "Borracha", "price": 15, "status": "A" }
+    ]);
+
+- _ids deve ser unicos
+- se houver um erro, ele para a gravacao e nao insere mais nenhum dado
+- para continuar as insercoes pulando os erros, devemos adicionar um segundo parametro. EX:
+
+    db.nomeDoDB.insertMany([
+        { "productName": "Lapis", "stock": 10, "price": 20,"status":"A"},
+        { "productName": "Tesoura", "price": 5, "status": "B" },
+        { "productName": "Borracha", "price": 15, "status": "A" }
+    ], {ordered: false});
+
+
+
+*FIND*
+
+Após inserir documentos em seu banco de dados, você vai querer recuperá-los. Certo?
+Assim como nos bancos de dados relacionais, no MongoDB temos um método específico para essa operação: o find().
+
+O método find() serve para selecionar os documentos de uma coleção e retorna um cursor com esses documentos.
+
+Esse método recebe dois parâmetros:
+
+    db.collection.find(query, projection)
+
+query (opcional):
+
+    Tipo: documento;
+    Descrição: especifica os filtros da seleção usando os query operators . Para retornar todos os documentos da coleção, é só omitir esse parâmetro ou passar um documento vazio ({}).
+
+projection (opcional):
+
+    Tipo: documento;
+    Descrição: especifica quais atributos serão retornados nos documentos selecionados pelo parâmetro query . Para retornar todos os atributos desses documentos, é só omitir esse parâmetro.
+    Esse método retorna um cursor para os documentos que correspondem aos critérios de consulta.
+
+
+Como dito, o parâmetro projection determina quais atributos serão retornados dos documentos que atendam aos critérios de filtro:
+
+    { "atributo1": <valor>, "atributo2": <valor> ... }
+
+O <valor> pode ser uma das seguintes opções:
+
+    - 1 ou true para incluir um campo nos documentos retornados;
+    - 0 ou false para excluir um campo;
+    - Uma expressão usando Projection Operators;
+
+
+Você pode escolher exibir no resultado da consulta apenas certos atributos.
+A projeção é sempre o segundo parâmetro do método find() .
+Veja só este exemplo:
+
+    db.movies.insertOne(
+        {
+            "title" : "Forrest Gump",
+            "category" : [ "drama", "romance" ],
+            "imdb_rating" : 8.8,
+            "filming_locations" : [
+                { "city" : "Savannah", "state" : "GA", "country" : "USA" },
+                { "city" : "Monument Valley", "state" : "UT", "country" : "USA" },
+                { "city" : "Los Anegeles", "state" : "CA", "country" : "USA" }
+            ],
+            "box_office" : {
+                "gross" : 557,
+                "opening_weekend" : 24,
+                "budget" : 55
+            }
+        }
+    )
+
+A operação acima insere um documento na coleção movies com vários atributos. Com a operação abaixo, selecionamos esse documento na coleção movies , passando como parâmetro de projeção apenas os atributos title e imdb_rating :
+
+    db.movies.findOne(
+        { "title" : "Forrest Gump" },
+        { "title" : 1, "imdb_rating" : 1 }
+    )
+
+Como resultado, teremos o seguinte:
+
+    {
+        "_id" : ObjectId("5515942d31117f52a5122353"),
+        "title" : "Forrest Gump",
+        "imdb_rating" : 8.8
+    }
+
+Note que o atributo _id também foi retornado. Isso acontece porque ele é o único atributo que você não precisa especificar para que seja retornado. O movimento aqui é ao contrário, se você não quiser vê-lo no retorno, é só suprimí-lo da seguinte forma:
+
+    db.movies.findOne(
+        { "title" : "Forrest Gump" },
+        { "title" : 1, "imdb_rating" : 1, "_id": 0 }
+    )
+
+Agora sim, nosso resultado será apenas com os atributos devidos:
+
+    {
+        "title" : "Forrest Gump",
+        "imdb_rating" : 8.8
+    }
+
+
+
+*Gerenciamento do cursor*
+
+Ao executar o método find() , o MongoDB Shell itera automaticamente o cursor para exibir os 20 primeiros documentos. Digite it para continuar a iteração. Assim, mais 20 documentos serão exibidos até o final do cursor.
+Um método bastante interessante que é utilizado num cursor é o count() . O método count() retorna o número de documentos de uma coleção, e também pode receber um critério de seleção para retornar apenas o número de documentos que atendam a esse critério.
+Você pode retornar o número de documentos de uma coleção com a seguinte operação:
+
+    db.movies.count()
+
+
+*Tipos e comparações*
+
+O MongoDB trata alguns tipos de dados como equivalentes para fins de comparação. Por exemplo, tipos numéricos sofrem conversão antes da comparação. No entanto, para a maioria dos tipos de dados, os operadores de comparação realizam comparações apenas em documentos em que o tipo BSON do atributo destino do documento corresponde ao tipo do operando da query.
+
+Colecao para exemplo:
+
+    { "_id": "apples", "qty": 5 }
+    { "_id": "bananas", "qty": 7 }
+    { "_id": "oranges", "qty": { "in stock": 8, "ordered": 12 } }
+    { "_id": "avocados", "qty": "fourteen" }
+
+A operação abaixo usa o operador de comparação $gt( greater than , maior que, >) para retornar os documentos em que o valor do atributo qty seja maior do que 4:
+
+    db.collection.find( { qty: { $gt: 4 } } )
+
+A operação trará como retorno os seguintes documentos:
+
+    { "_id": "apples", "qty": 5 }
+    { "_id": "bananas", "qty": 7 }
+
+O documento com o _id igual a "avocados" não foi retornado porque o valor do campo qty é do tipo string , enquanto o operador $gt é do tipo integer .
+O documento com o _id igual a "oranges" também não foi retornado porque qty é do tipo object.
+
+
+*Selecionando todos os documentos da coleção*
+
+O método find() , quando utilizado sem parâmetros, retorna todos os documentos da coleção juntamente com todos os seus campos. Por exemplo, a operação abaixo retorna todos os documentos da coleção bios:
+
+    db.bios.find()
+
+Essa operação corresponde à seguinte consulta no SQL:
+
+    SELECT * FROM bios;
+
+
+*Selecionando documentos com critérios de busca*
+
+Query por igualdade
+
+A operação abaixo retorna os documentos da coleção bios em que o atributo _id é igual a 5:
+
+    db.bios.find( { _id: 5 } );
+
+Essa operação corresponde à seguinte consulta no SQL:
+
+    SELECT * FROM bios WHERE _id = 5;
+
+Agora, a operação abaixo retorna todos os documentos da coleção bios em que o campo last do subdocumento name é igual a "Hopper":
+
+    db.bios.find( { "name.last": "Hopper" } );
+
+Note que, para acessar campos em subdocumentos, utilizamos dot notation (por exemplo, "subdocumento.atributo").
+
+
+
+*Projetando somente os atributos requeridos*
+
+Através do segundo parâmetro do método find() , podemos especificar quais atributos serão retornados. O exemplo abaixo retorna todos os documentos da coleção bios , trazendo apenas o atributo name de cada documento:
+
+    db.bios.find({}, { name: 1 });
+
+Lembrando que o atributo name é um subdocumento , pois armazena um objeto com outros atributos.
+Essa operação corresponde à seguinte consulta no SQL :
+
+    SELECT name FROM bios;
+
+Procure utilizar a projeção para diminuir a quantidade de campos retornados pelo cursor. Isso ajuda muito no que se refere ao tráfego desses dados na rede!
+
+
+*Limitando o número de documentos retornados*
+
+limit()
+
+Você pode limitar o número de documentos retornados por uma consulta utilizando o método limit() . Esse método é semelhante à declaração LIMIT em um banco de dados que utiliza SQL. Uma utilização comum do limit() é para maximizar a performance e evitar que o MongoDB retorne mais resultados do que o necessário para o processamento.
+
+Sintaxe:
+
+    db.collection.find(<query>).limit(<número>)
+
+Exemplo:
+
+    db.bios.find().limit(5)
+
+A operação acima retornará os cinco primeiros documentos da coleção bios.
+Essa operação corresponde à seguinte consulta no SQL:
+
+    SELECT * FROM bios LIMIT 5;
+
+
+pretty()
+
+Deixa os resultados mais legiveis, identa tudo da maneira que estamos acostumados a ler.
+
+    db.bios.find().limit(2).pretty()
+
+
+
+*"Pulando" documentos*
+
+skip('numero de resultados a serem pulados')
+
+Acione o método skip() para controlar a partir de que ponto o MongoDB começará a retornar os resultados.
+Essa abordagem pode ser bastante útil para realizar paginação dos resultados.
+O método skip() precisa de um parâmetro numérico que determinará quantos documentos serão "pulados" antes de começar a retornar.
+
+Exemplo:
+
+    db.bios.find().skip(2);
+
+Você pode combinar os métodos limit() e skip() criando, assim, uma paginação:
+
+    db.bios.find().limit(10).skip(5);
+
+Essa operação corresponde à seguinte consulta no SQL:
+
+    SELECT * FROM bios LIMIT 10 OFFSET 5;

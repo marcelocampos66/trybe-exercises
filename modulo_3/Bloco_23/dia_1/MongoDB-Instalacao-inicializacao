@@ -1,0 +1,92 @@
+** Tipos de Instalacao **
+
+O MongoDB disponibiliza três tipos de instalação:
+
+Standalone
+
+    - Apenas indicado para ambientes de desenvolvimento
+    - Não exige nenhum tipo de configuração relativa à segurança;
+
+Replica Set
+
+    - É o mínimo indicado para ambientes de produção.
+    - Neste tipo, os dados são replicados em cada um dos servidores do cluster e temos apenas um ponto de escrita.
+    - Em alguns casos, podemos utilizar os demais servidores para escalar a leitura.
+
+Shard
+
+    - Esse é um tipo de instalação no qual podemos escalar a escrita de informações no banco.
+    - Os dados são divididos no cluster através de chaves de partição que chamamos de shard keys .
+    - A shard key pode ser composta por um ou mais atributos do documento, e sua escolha pode afetar a performance, eficiência e escalabilidade do banco.
+    - Escalar a escrita significa dar mais capacidade para que o banco de dados processe mais operações, aumentando a performance.
+
+
+
+*INSTALACAO*
+
+1- Import the public key used by the package management system.
+
+    wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+
+2 - Create a list file for MongoDB.
+
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+3 - Reload local package database.
+
+    sudo apt-get update
+
+4 - Install the MongoDB packages.
+
+    sudo apt-get install -y mongodb-org
+
+
+*INICIALIZACAO DO MONGODB*
+
+    sudo service mongod start
+
+para verificar se o status:
+
+     sudo service mongod status
+
+
+*PARANDO A INSTANCIA*
+
+    sudo service mongod stop
+
+
+*REINICIANDO A INSTANCIA*
+
+    sudo service mongod restart
+
+
+*CASO QUEIRA QUE O MONGODB INICIE COM O SISTEMA*
+
+    sudo systemctl enable mongod.service
+
+para reverter e voltar a nao inicializar com o sistema
+
+    sudo systemctl disable mongod.service
+
+
+*DESINSTALACAO*
+
+1 - Pare a instancia do MongoDB:
+
+    sudo service mongod stop
+
+2 - Remova todos os pacotes instalados:
+
+    sudo apt-get purge mongodb-org*
+
+3 - Agora, remova os arquivos de dependências que não são mais necessários. Em seguida, remova as versões antigas dos arquivos de pacotes.
+
+    sudo apt-get autoremove
+    sudo apt-get autoclean
+
+4 - Após isso, remova os arquivos do mongodb que podem ter ficado para trás.
+
+    sudo rm -rf /var/log/mongodb
+    sudo rm -rf /var/lib/mongodb
+
+Se a desinstalação for concluída com sucesso, o comando mongod --version não deve retornar a versão do seu mongodb.
