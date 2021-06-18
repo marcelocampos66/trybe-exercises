@@ -1,6 +1,6 @@
 const perguntas = require('readline-sync');
 
-const number = perguntas.questionInt('Numero de elementos da sequencia fibonacci');
+const number = perguntas.questionInt('Numero de elementos da sequencia fibonacci ');
 
 const fibonacci = (n) => {
   const result = [1, 1];

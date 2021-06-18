@@ -2,7 +2,7 @@ const perguntas = require('readline-sync');
 
 const sorteio = () => {
   const randomNumber = Math.ceil(Math.random() * 10);
-  const inputNumber = perguntas.questionInt('Digite um numero de 1 a 10');
+  const inputNumber = perguntas.questionInt('Digite um numero de 1 a 10 ');
 
   if (inputNumber === randomNumber) {
     console.log('Parabéns, número correto!');

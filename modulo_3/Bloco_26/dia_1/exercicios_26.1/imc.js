@@ -1,8 +1,8 @@
 const perguntas = require('readline-sync');
 
 const calcIMC = () => {
-  const peso = perguntas.questionFloat('Qual eh o seu peso?');
-  const altura = perguntas.questionInt('Qual eh a sua altura?');
+  const peso = perguntas.questionFloat('Qual eh o seu peso? ');
+  const altura = perguntas.questionInt('Qual eh a sua altura? ');
   const alt = altura / 100;
   const result = (peso / Math.pow(alt, 2)).toFixed(2);
 
