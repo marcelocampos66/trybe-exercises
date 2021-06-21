@@ -1,0 +1,375 @@
+*Callbacks*
+
+
+Conforme o próprio nome diz, callback tem a ver com "chamar de volta". Basicamente, toda vez que precisarmos que algo seja processado em segundo plano, devemos registrar uma callback.
+
+Vamos usar como exemplo a função readFile do módulo fs do Node.js. Ela realiza a leitura de um arquivo e, quando termina, chama uma função de callback, passando o resultado:
+
+    const fs = require('fs');
+
+    fs.readFile('./arquivo.txt', (err, content) => {
+      if (err) {
+        console.error(`Erro ao ler o arquivo: ${err.message}`);
+        return;
+      }
+
+      console.log(`Arquivo lido com sucesso. Conteúdo: ${content.toString('utf8')}`);
+    });
+
+No exemplo acima, passamos uma função para readFile , à qual damos o nome de callback . Essa função de callback recebe dois parâmetros: o primeiro, que chamamos de err , é um erro que pode ter ocorrido durante a leitura do arquivo. Caso nenhum erro tenha ocorrido, esse parâmetro será undefined . O segundo parâmetro é, nesse caso, o conteúdo do arquivo, em forma de uma sequência de bytes, que chamamos de content . Caso ocorra um erro na leitura do arquivo, esse parâmetro será undefined .
+Sabendo disso, veja abaixo o que esse código faz:
+
+    1- Primeiro, pedimos que o Node.js leia o arquivo, e passamos uma função de callback;
+    2- Quando a leitura do arquivo é concluída ou um erro acontece, nossa função é chamada;
+    3- Dentro dela, a primeira coisa que fazemos é verificar se existe um erro. Caso exista, escrevemos ele no console e encerramos a execução com o return ;
+    4- Caso nenhum erro tenha acontecido, sabemos que nosso arquivo foi lido com sucesso e, portanto, seu conteúdo está no segundo parâmetro, que chamamos de content.
+
+Esse formato de callback que recebe dois parâmetros, erro e resultado, não foi utilizado por acaso. Callbacks desse tipo são chamadas de node-style callbacks e são, por convenção, a melhor maneira de se estruturar uma callback. Toda API de módulos nativos do Node.js utiliza esse mesmo formato de callbacks.
+
+
+*O lado ruim dos callbacks*
+
+A principal desvantagem das callbacks vem do fato de que o resultado de uma operação só existe dentro daquela callback; ou seja: se precisamos executar uma coisa depois da outra, precisamos colocar uma callback dentro da outra. À medida que vamos fazendo isso, vamos aumentando o nível de indentação necessária e, portanto, aumentamos a dificuldade de ler e até mesmo de dar manutenção no código.
+
+Suponhamos que precisamos ler, sequencialmente, três arquivos, e que vamos fazê-lo de forma assíncrona, para não travar nosso servidor:
+
+    const fs = require('fs');
+    
+    fs.readFile('file1.txt', (err, file1Content) => {
+      if (err) return console.log(`Erro ao ler arquivo 1: ${err.message}`);
+
+      console.log(`Lido file1.txt com ${file1Content.byteLength} bytes`);
+
+      fs.readFile('file2.txt', (err, file2Content) => {
+        if (err) return console.log(`Erro ao ler o arquivo 2: ${err.message}`);
+
+        console.log(`Lido file2.txt com ${file2Content.byteLength} bytes`);
+
+        fs.readFile('file3.txt', (err, file3Content) => {
+          if (err) return console.log(`Erro ao ler o arquivo 3: ${err.message}`);
+
+          console.log(`Lido file3.txt com ${file3Content.byteLength} bytes`);
+        });
+      });
+    });
+
+Com três níveis de indentação, já dá pra perceber que o código começa a ficar menos legível.
+
+Uma forma de tentar resolver o problema é quebrar o código em infinitas funções menores, que não fazem nada além de chamar a próxima callback, mas isso também não é tão simples, organizado, ou mesmo bonito, e acaba por não funcionar. Exemplo:
+
+    const fs = require('fs');
+
+    const file3Callback = (err, file3Content) => {
+      if (err) return console.log(`Erro ao ler o arquivo 3: ${err.message}`);
+
+      console.log(`Lido file3.txt com ${file3Content.byteLength} bytes`);
+    };
+
+    const file2Callback = (err, file2Content) => {
+      if (err) return console.log(`Erro ao ler o arquivo 2: ${err.message}`);
+
+      console.log(`Lido file2.txt com ${file2Content.byteLength} bytes`);
+
+      fs.readFile('file3.txt', file3Callback);
+    };
+
+    const file1Callback = (err, file1Content) => {
+      if (err) return console.log(`Erro ao ler arquivo 1: ${err.message}`);
+
+      console.log(`Lido file1.txt com ${file1Content.byteLength} bytes`);
+
+      fs.readFile('file2.txt', file2Callback);
+    };
+
+    fs.readFile('file1.txt', file1Callback);
+
+Depois de uma ou duas funções "aninhadas", fica fácil perder a linha de raciocínio, além de que é complicado entender logo de cara o fluxo em que o código acontece.
+
+
+
+*Promises*
+
+O conceito de uma Promise, ou um objeto Promise, não é muito diferente da ideia de uma promessa na vida real: alguém se compromete com outra pessoa a fazer algo. Essa promessa pode ser cumprida e, portanto, resolvida , ou algo pode dar errado, fazendo com que não seja possível cumprir a promessa, que será então rejeitada . Promises no JavaScript funcionam do mesmo jeito: uma promessa é criada, e dentro dela existe código a ser executado. Se o código é executado sem nenhum problema, a Promise é resolvida através da função resolve , que veremos daqui a pouco. Se algo dá errado durante a execução do código, a Promise é rejeitada através da função reject.
+
+Exemplo 1: Tratando erros de forma síncrona.
+
+    function dividirNumeros(num1, num2) {
+      if (num2 == 0) throw new Error("Não pode ser feito uma divisão por zero");
+
+      return num1 / num2;
+    }
+
+    try {
+      const resultado = dividirNumeros(2, 1);
+      console.log(`resultado: ${resultado}`);
+    } catch (e) {
+      console.log(e.message);
+    }
+
+Exemplo 2: Tratando erros de forma assíncrona.
+
+    function dividirNumeros(num1, num2) {
+      const promise = new Promise((resolve, reject) => {
+        if (num2 == 0) reject(Error("Não pode ser feito uma divisão por zero"));
+
+        const resultado = num1 / num2;
+        resolve(resultado)
+      });
+
+      return promise;
+    }
+
+    dividirNumeros(2, 1)
+      .then(result => console.log(`sucesso: ${result}`))
+      .catch(err => console.log(`erro: ${err.message}`));
+
+No segundo exemplo, repare que a função dividirNumeros retorna uma Promise, ou seja: ela promete que vai dividir os números. Caso não consiga realizar a divisão, ela rejeita essa promessa, utilizando a função reject . Caso dê tudo certo, ela resolve a promessa, utilizando a função resolve . Tudo que será realizado de forma assíncrona , ou seja, em segundo plano, pode também ser encarado da mesma forma.
+
+Sempre que precisarmos criar uma nova Promise, invocaremos o construtor através da palavra-chave new . Para esse construtor, devemos passar uma função, que é chamada de executor ; é ela quem vai, de fato, tentar cumprir a promessa que estamos fazendo. A função executor recebe outras duas funções como parâmetros: resolve e reject . Isso tudo fica assim:
+
+    const p = new Promise((resolve, reject) => {
+      // Aqui é onde vamos realizar a lógica que precisamos
+      // para "tentar cumprir" a promessa
+    });
+
+Feito isso, o próximo passo é escrever o código:
+
+    const fs = require('fs');
+
+    function readFilePromise (fileName) {
+      return new Promise((resolve, reject) => {
+
+        fs.readFile(fileName, (err, content) => {
+          if (err) return reject(err);
+          resolve(content);
+        });
+
+      });
+    }
+
+Vamos entender o que estamos fazendo aqui:
+
+    - Recebemos, como parâmetro, o nome do arquivo que queremos ler, na linha 3;
+    - Criamos e retornamos uma nova Promise, na linha 4;
+    - Chamamos o módulo nativo do node, fs , para realizar a leitura desse arquivo, na linha 6;
+    - Na linha 7, dentro da callback que passamos para a função readFile , verificamos se ocorreu um erro. Se sim, rejeitamos a Promise e encerramos a execução;
+    - Caso não tenha acontecido nenhum erro, resolvemos a Promise com o resultado da leitura do arquivo.
+
+Para entender como podemos consumir uma Promise, vamos nos atentar a alguns detalhes:
+
+- A função que passamos para a Promise só consegue retornar um resultado através da função resolve que ela recebe. Por isso, o fato de chamarmos return reject(err) na linha 7 não faz diferença, já que a Promise será rejeitada, e o retorno da callback passada para readFile é simplesmente ignorado. Na verdade, isso geralmente é válido para qualquer callback. Como callbacks geralmente são chamadas para lidar com resultados, seu retorno raramente importa para a função que a chamou ou que recebeu esses resultados.
+
+- resolve e reject são os nomes das funções que a Promise passa para a função executor . No entanto, para nós, elas são apenas parâmetros que são passados pra nossa função. Logo, não importa muito o nome que damos a elas, pois para o JavaScript isso é indiferente. De qualquer forma, chamar essas funções de qualquer outra coisa não é considerado uma boa prática, pois pode dificultar a legibilidade do código.
+
+Vamos agora entender como podemos consumir essa Promise. Vimos antes que Promises permitem que a callback de erro seja registrada de determinada forma e que callbacks de sucesso sejam registradas de outra forma. Exemplo:
+
+    readFilePromise('./file.txt') // A função me promete que vai ler o arquivo
+      .then((content) => { // Caso ela cumpra o que prometeu
+        console.log(`Lido arquivo com ${content.byteLength} bytes`); // Escrevo o resultado no console
+      })
+      .catch((err) => { // Caso ela não cumpra o que prometeu
+        console.error(`Erro ao ler arquivo: ${err.message}`); // Escrevo o erro no console
+      });
+
+Essa funcionalidade nos permite criar estruturas de pipeline , em que uma operação recebe como entrada o resultado da operação anterior, e esses resultados todos podem ser compostos e formar um único resultado. Exemplo:
+
+
+    const fs = require('fs');
+
+    function readFilePromise (fileName) {
+      return new Promise((resolve, reject) => {
+        fs.readFile(fileName, (err, content) => {
+          if (err) return reject(err);
+          resolve(content);
+        });
+      });
+    }
+
+    readFilePromise('file1.txt') // A função me promete que vai ler o arquivo
+      .then((content) => { // Caso arquivo 1 seja lido,
+        console.log(`Lido file1.txt com ${content.byteLength} bytes`); // Escrevo o resultado no console
+        return readFilePromise('file2.txt'); // Chamo novamente a função, que me retorna uma nova Promise
+      })
+      .then(content => { // Caso a Promise retornada pelo `then` anterior seja resolvida,
+        console.log(`Lido file2.txt com ${content.byteLength} bytes`); // Escrevemos o resultado no console
+        return readFilePromise('file3.txt'); // E chamamos a função novamente, recebendo uma nova promessa
+      })
+      .then((content) => { // Caso a promessa de leitura do `file3.txt` seja resolvida,
+        console.log(`Lido file3.txt com ${content.byteLength} bytes`); // Logamos o resultado no console
+      })
+      .catch((err) => { // Caso qualquer uma das promessas ao longo do caminho seja rejeitada
+        console.log(`Erro ao ler arquivos: ${err.message}`); // Escrevemos o resultado no console
+      });
+
+
+*Lendo arquivos com métodos síncronos*
+
+Exemplo:
+
+    const fs = require('fs');
+
+    const nomeDoArquivo = 'meu-arquivo.txt';
+
+    try {
+      const data = fs.readFileSync(nomeDoArquivo, 'utf8');
+      console.log(data);
+    } catch (err) {
+      console.error(`Erro ao ler o arquivo: ${err.path}`);
+      console.log(err);
+    }
+
+Se quisermos esse comportamento, precisamos de um método síncrono . O método disponibilizado pelo módulo fs para leitura síncrona de arquivos é o fs.readFileSync.
+
+Método fs.readFileSync
+
+Esse método é responsável por ler arquivos e trazer seu conteúdo para dentro do Node.js. Por ser síncrono , ele espera a leitura do arquivo terminar para, só então, atribuir o resultado à constante data.
+
+O método readFileSync recebe dois parâmetros:
+
+    - O nome do arquivo;
+    - Um parâmetro opcional que, quando é uma string, define o encoding que será utilizado durante a leitura do arquivo.
+
+Mas e se ocorrer um erro na leitura do arquivo?
+
+Com funções síncronas, como readFileSync , você deve tratar explicitamente os erros que puderem acontecer. Nesse exemplo, usamos um bloco try...catch para capturar quaisquer erros que possam acontecer durante a leitura do arquivo e imprimimos uma mensagem para o usuário no terminal.
+
+
+*Lendo arquivos com métodos assíncronos*
+
+O método fornecido pelo módulo fs para leitura assíncrona de arquivos é o fs.readFile . Na versão padrão do fs , a função readFile aceita um callback, que é chamado quando a leitura do arquivo termina. Exemplo:
+
+    const fs = require('fs');
+
+    const nomeDoArquivo = 'meu-arquivo.txt';
+
+    fs.readFile(nomeDoArquivo, 'utf8', (err, data) => {
+      if (err) {
+        console.error(`Não foi possível ler o arquivo ${nomeDoArquivo}\n Erro: ${err}`);
+        process.exit(1);
+      }
+      console.log(`Conteúdo do arquivo: ${data}`);
+    });
+
+Método fs.readFile
+
+Esse método também é responsável por ler arquivos e trazer seu conteúdo para dentro do Node.js.
+
+Ele recebe três parâmetros:
+
+    - O nome do arquivo;
+    - Um parâmetro opcional que, quando é uma string, define o encoding que será utilizado durante a leitura do arquivo;
+    - Uma callback que permite receber e manipular os dados lidos do arquivo.
+
+A callback é uma função que recebe dois parâmetros: err e data . Caso ocorra um erro durante a leitura do arquivo, o parâmetro err virá preenchido com as informações referentes ao erro. Quando esse parâmetro vier vazio, significa que a leitura do conteúdo do arquivo ocorreu sem problemas. Nesse caso, o segundo parâmetro, data , virá preenchido com o conteúdo do arquivo.
+
+O tipo de encoding que escolhemos é muito importante. Se não for especificado, por padrão, o arquivo será lido como raw buffer , que é um formato muito útil quando estamos enviando dados através de requisições HTTP. No nosso caso, como queremos manipular o conteúdo do arquivo como uma string, então o certo é especificar o encoding.
+
+
+No entanto, essa não é a única forma do método readFile . O módulo fs possui um segundo modelo de API que, em vez de trabalhar com callbacks, retorna Promises, o que torna seu uso muito mais recomendável.
+
+Para utilizar a interface de Promises do fs , precisamos alterar a importação do módulo fs , importando, agora fs/promises . Vamos ver como ficaria o código acima se utilizarmos Promises:
+
+    const fs = require('fs/promises');
+
+    const nomeDoArquivo = 'meu-arquivo.txt';
+
+    fs.readFile(nomeDoArquivo, 'utf8')
+      .then((data) => {
+        console.log(`Conteúdo do arquivo: ${data}`);
+      })
+      .catch((err) => {
+        console.error(`Não foi possível ler o arquivo ${nomeDoArquivo}\n Erro: ${err}`);
+        process.exit(1); // Encerra a execução do script e informa ao sistema operacional que houve um erro com código
+      });
+
+
+*Escrevendo dados em arquivos*
+
+Escrever dados em arquivos é um processo bem parecido com a leitura de dados! Assim como o módulo fs/promises disponibiliza o método readFile , há também o método writeFile.
+
+"Atenção: O módulo fs também disponibiliza um método writeFile , que funciona utilizando callbacks. Vamos utilizar diretamente o módulo fs/promises , já que o uso de Promises é bem mais encorajado que o uso de callbacks."
+
+Exemplo:
+
+    const fs = require('fs/promises');
+
+    fs.writeFile('./meu-arquivo.txt', 'Meu textão')
+      .then(() => {
+        console.log('Arquivo escrito com sucesso!');
+      })
+      .catch((err) => {
+        console.error(`Erro ao escrever o arquivo: ${err.message}`);
+      });
+
+você pode especificar algumas opções na escrita de arquivos passando um terceiro parâmetro opcional para os métodos writeFile e writeFileSync . A opção flag especifica como o arquivo deve ser aberto e manipulado. O padrão é 'w' , que especifica que o arquivo deve ser aberto para escrita. Se o arquivo não existir, ele é criado. Caso contrário, ele é reescrito, ou seja, tem seu conteúdo apagado antes de o novo conteúdo ser escrito. A flag 'wx' , por exemplo, funciona como 'w' , mas lança um erro caso o arquivo já exista:
+
+    const fs = require('fs/promises');
+
+    // A flag wx abre o arquivo para escrita **apenas** caso ele não exista. Caso o contrário, um erro será lançado
+    fs.writeFile('./meu-arquivo.txt', 'Eu estive aqui :eyes:', { flag: 'wx' })
+      .then(() => {
+        console.log('Arquivo salvo');
+      })
+      .catch((err) => {
+        // Se o arquivo existir, um erro é retornado
+        console.error('err');
+      });
+
+Quando rodamos o código com a flag wx , tentando escrever no arquivo meu-arquivo.txt , é gerado o seguinte erro:
+
+    [...]
+    [Error: EEXIST: file already exists, open './meu-arquivo.txt'] {
+      errno: -17,
+      code: 'EEXIST',
+      syscall: 'open',
+      path: './meu-arquivo.txt'
+    }
+
+
+*Utilizando async/await*
+
+Acontece que nem sempre queremos utilizar essa API das Promises. Muitas vezes, queremos simplesmente buscar o resultado e pronto. E é aí que entra o async/await .
+Essas duas palavras-chave foram criadas para trabalhar com Promises como se estivéssemos trabalhando com código síncrono.
+A questão é que toda função na qual utilizamos async , automaticamente passa a retornar uma Promise, que será rejeitada em caso de erro, e resolvida em caso de sucesso.
+
+O resultado de usarmos async / await é que o código fica com uma sintaxe quase idêntica à sintaxe utiliada para código síncrono.
+Exemplo anterior utilizando async/await:
+
+    const fs = require('fs/promises');
+
+    async function main() {
+      try {
+        await fs.writeFile('./meu-arquivo.txt', 'Meu textão');
+        console.log('Arquivo escrito com sucesso!');
+      } catch (err) {
+        console.error(`Erro ao escrever o arquivo: ${err.message}`);
+      }
+    }
+
+    main();
+
+Perceba que, para podermos utilizar o async/await , precisamos criar uma função main e colocar nossa lógica dentro dela. Isso acontece porque, por enquanto, o await só pode ser utilizado dentro de funções async.
+
+
+Rodando tudo junto
+
+Promises são executadas assim que são criadas. Isso quer dizer que, no código abaixo, todos os arquivos serão lidos ao mesmo tempo e, portanto, não teremos uma forma de saber quando cada um vai terminar de ser lido. Mas e se precisarmos do resultado da leitura dos três arquivos? solucao = Promise.all !
+
+O Promise.all é um método da Promise que nos permite passar um array de Promises e receber, de volta, uma única Promise. Ela será resolvida com os resultados de todas as Promises, assim que todas elas forem resolvidas. Esse método também nos permite utilizar um único catch , que será chamado caso qualquer uma das Promises seja rejeitada. Exemplo:
+
+    const fs = require('fs/promises');
+
+    Promise.all([
+      fs.readFile('file1.txt'),
+      fs.readFile('file2.txt'),
+      fs.readFile('file3.txt'),
+    ])
+      .then(([file1, file2, file3]) => {
+        const fileSizeSum = file1.byteLength + file2.byteLength + file3.byteLength;
+        console.log(`Lidos 3 arquivos totalizando ${fileSizeSum} bytes`);
+      })
+      .catch((err) => {
+        console.error(`Erro ao ler arquivos: ${err.message}`);
+      });
+
+Ótimo! Agora, estamos lendo os três arquivos ao mesmo tempo, e nosso .then será executado quando a leitura de todos eles terminar, recebendo como parâmetro um array com o resultado de cada uma das Promises.
