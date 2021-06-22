@@ -1,0 +1,357 @@
+**Testes com NodeJS**
+
+Para implementar testes no back-end iremos utilizar a dupla mocha e chai.
+
+Para utilizarmos essas ferramentas precisamos primeiro fazer a instalação, repare que utilizaremos a flag -D . Esses módulos só serão utilizados em fase de desenvolvimento e não serão utilizados para executar nossa aplicação quando ela for publicada. Comando de instalacao:
+
+    npm install -D mocha chai
+        OU
+    npm install --save-dev mocha chai
+
+
+*Tipos de teste*
+
+Uma coisa importante para se ter em mente na hora de produzir é o escopo e a interação dos testes. Para isso, existem algumas divisões arbitrárias que nos ajudam a pensar uma ordem de desenvolvimento de testes:
+
+    Testes unitários : Trabalham presumindo um escopo limitado a um pequeno fragmento do seu código com interação mínima entre recursos externos. Ex: Uma função com um fim específico, como uma função que soma dois números.
+
+    Testes de integração : Trabalham presumindo a junção de múltiplos escopos (que tecnicamente devem possuir, cada um, seus próprios testes) com interações entre eles. Ex: Uma função de calculadora que usa funções menores que eu posso testar isoladamente/ de forma unitária.
+
+    Testes de Ponto-a-ponto : Chamados também de Fim-a-fim (End-to-End; E2E), esses testes pressupõe um fluxo de interação completo com a aplicação, de um ponto a outro: Aqui, poderíamos pensar uma API que utiliza nossa calculadora (assim como diversas outras funções mais complexas) na hora de realizar uma operação de venda de produtos. Esse teste é o mais completo pois pressupõe que todos os demais testes estão ou serão desenvolvidos (Pensando na prática do TDD que veremos mais adiante).
+
+
+*Escrevendo testes*
+
+*Estruturando testes com o Mocha*
+
+O mocha é um framework de testes para JS, isso significa que ele nos ajuda a arquitetar os nossos testes, nos fornecendo a estrutura e interface para escrevermos os nossos testes.
+
+Temos que descrever o comportamento nos testes para dizermos o que estamos testando naquela caso específico. Para isso, o mocha nos fornece duas palavras reservadas o describe e o it. O describe nos permite adicionar uma descrição para um teste específico ou um grupo de testes. Já o it nos permite sinalizar exatamente o cenário de teste que estamos testando naquele ponto.
+
+Na prática como podemos fazer isso com a ajuda do mocha . O cenário 1 , utilizando describe para descrever o cenário ficaria assim:
+
+    describe('Quando a média for menor que 7', () => {
+      //
+    });
+
+O describe aceita dois parâmetros: o primeiro é a descrição e o segundo uma função para executar o cenário de teste. Não é necessário importar o mocha em nosso arquivo, suas palavras reservadas serão interpretadas quando executamos o testes.
+O que será testado de fato, ou seja, o que é esperado. Para isso, temos o it:
+
+    describe('Quando a média for menor que 7', () => {
+      it('retorna "reprovado"', () => {
+        //
+      });
+    });
+
+A sintaxe do it é bem semelhante à do describe : ela aceita uma string, qual o comportamento a ser testado, e uma função que executa os testes de fato.
+
+
+*Testes com o Chai*
+
+O chai nos ajudará com as asserções, ou seja, ele nos fornece maneiras de dizermos o que queremos testar e então ele validará se o resultado condiz com o esperado.
+Essa validação é o que chamamos de assertion, "asserção" ou, em alguns casos, "afirmação". Para nos ajudar com essa tarefa temos o chai , que nos fornece diversos tipos de validações diferentes.
+
+Usaremos a interface expect do chai em nossos exemplos, que significa de fato o que é esperado para determinada variável:
+
+    const resposta = calculaSituacao(4);
+
+    expect(resposta).equals('reprovado');
+
+estamos chamando nossa função e, logo em seguida, afirmamos que seu retorno, armazenado na constante resposta , deve ser igual a ( equals ) reprovado.
+
+Teste inteiro com mocha + chai:
+
+    const { expect } = require('chai');
+
+    const calculaSituacao = require('../examples/calculaSituacao');
+
+    describe('Quando a média for menor que 7', () => {
+      it('retorna "reprovado"', () => {
+        const resposta = calculaSituacao(4);
+
+        expect(resposta).equals('reprovado');
+      });
+    });
+
+Para tornar nosso teste ainda mais legível e elegante, o chai nos fornece outros getters encadeáveis que possuem um papel puramente estético. Por exemplo o to e o be , que nos permite escrever nossa assertion da seguinte maneira:
+
+    const { expect } = require('chai');
+
+    const calculaSituacao = require('../examples/calculaSituacao');
+
+    describe('Quando a média for menor que 7', () => {
+      it('retorna "reprovado"', () => {
+        const resposta = calculaSituacao(4);
+
+        expect(resposta).to.be.equals('reprovado');
+      });
+    });
+
+
+*Executando o teste*
+
+O mocha é o responsável por executar nossos testes. Ele entenderá as palavras reservadas describe e it , assim como a estrutura do nosso teste.
+Poderíamos tê-lo instalado de maneira global ( npm install -g mocha ) em nossa máquina, e bastaria chamá-lo diretamente em nosso terminal passando o arquivo do teste ( mocha tests/calculaSituacao.js ).
+Entretanto, faremos da maneira mais recomendada e elegante: utilizaremos o pacote que já temos instalado. Para isso, vamos adicionar um novo script ao nosso package.json , que chama o mocha e informa um arquivo ou diretório de testes. O script:
+
+    {
+    // ...
+      "scripts": {
+        "start": "node index.js",
+        "test": "mocha tests.js"
+      },
+    // ...
+    }
+
+Dessa forma, não precisamos instalar nada globalmente, e para executar nosso teste basta rodar em nosso terminal o script test , que irá executar o comando mocha tests utilizando o módulo instalado:
+
+    npm run test
+        OU
+    npm test
+
+
+*Testando todos os cenários*
+
+    const { expect } = require('chai');
+
+    const calculaSituacao = require('../examples/calculaSituacao');
+
+    describe('Quando a média for menor que 7', () => {
+      it('retorna "reprovado"', () => {
+        const resposta = calculaSituacao(4);
+
+        expect(resposta).to.be.equals('reprovado');
+      });
+    });
+
+    describe('Quando a média for maior que 7', () => {
+      it('retorna "aprovado"', () => {
+        const resposta = calculaSituacao(9);
+
+        expect(resposta).to.be.equals('aprovado');
+      });
+    });
+
+    describe('Quando a média for igual a 7', () => {
+      it('retorna "aprovado"', () => {
+        const resposta = calculaSituacao(7);
+
+        expect(resposta).to.be.equals('aprovado');
+      });
+    });
+
+
+*TDD - Transformando requisitos em testes*
+
+o conceito de TDD (Test Driven Development), em tradução livre, Desenvolvimento Orientado a Testes.
+A prática do TDD em começar a escrever os testes que traduzem e validam os comportamentos esperados para aquele código antes de começar a implementação.
+
+A ideia principal é começarmos escrever o código já pensando no que está sendo testado, ou seja, já teremos em mente quais os cenários que precisamos cobrir e também como nosso código precisa estar estruturado para que possamos testá-lo, já que códigos menos estruturados normalmente são mais difíceis de serem testados.
+
+Dessa forma, pensando em passos para o TDD, podemos pensar da seguinte maneira:
+
+1- Antes de qualquer coisa, precisamos interpretar os requisitos, pensando nos comportamentos que iremos implementar e a na estrutura do código: se será uma função, um módulo, quais os inputs, os outputs, etc..
+
+2- Tendo isso em mente, começamos a escrever os testes, ou seja, criamos a estrutura de describes e its que vimos.
+
+3- Depois, escrevemos as asserções. Perceba que antes mesmo de ter qualquer código, já iremos criar chamadas a esse código, o que significa que nossos testes irão falhar. Não se preocupe, pois essa é exatamente a ideia nesse momento.
+
+4- Agora que já temos os testes criados, vamos a implementação do nosso código. A ideia é escrever os códigos pensando nos testes e, conforme vamos cobrindo os cenários, nossos testes que antes quebravam começam a passar.
+
+
+*Exemplo tudo em pratica*
+
+Escreveremos uma função que lê o conteúdo de um arquivo. Essa função:
+
+    - Receberá um parâmetro com o nome do arquivo a ser lido. Esse arquivo deverá estar na pasta io-files;
+    - Caso o arquivo solicitado exista, responderá uma string com o conteúdo do arquivo;
+     Caso o arquivo solicitado não exista, deverá responder null.
+
+Execucao:
+
+    npm init # Iniciando o npm
+
+    npm install --save-dev mocha chai # Instalando as ferramentas de testes
+
+    {
+      //
+      "scripts": {
+        "start": "node index.js",
+        "test": "mocha test.js"
+      },
+      //
+    }
+
+Feito isso, vamos escrever nosso arquivo test.js:
+
+    const { expect } = require('chai');
+
+    const leArquivo = require('./leArquivo');
+
+    const CONTEUDO_DO_ARQUIVO = 'VQV com TDD';
+
+    describe('leArquivo', () => {
+      describe('Quando o arquivo existe', () => {
+        describe('a resposta', () => {
+          const resposta = leArquivo('arquivo.txt');
+
+          it('é uma string', () => {
+            expect(resposta).to.be.a('string');
+          });
+
+          it('é igual ao conteúdo do arquivo', () => {
+            expect(resposta).to.be.equals(CONTEUDO_DO_ARQUIVO);
+          });
+        });
+      });
+
+      describe('Quando o arquivo não existe', () => {
+        it('a resposta é igual a "null"', () => {
+          const resposta = leArquivo('arquivo_que_nao_existe.txt');
+
+          expect(resposta).to.be.equal(null);
+        });
+      });
+    });
+
+Implementacao da funcao:
+
+    const fs = require('fs');
+
+    function leArquivo(nomeDoArquivo) {
+      try {
+        const conteudoDoArquivo = fs.readFileSync(nomeDoArquivo, 'utf8');
+
+        return conteudoDoArquivo;
+      } catch (err) {
+        return null;
+      }
+    }
+
+    module.exports = leArquivo;
+
+
+*Sinon*
+
+O Sinon é uma ferramenta que fornece funções para diversos tipos dos Test Doubles ou, numa tradução livre, Dublês de Testes (remetendo aos dublês de filmes).
+
+No momento focaremos em um tipo de Test Double, o stub . Stubs são objetos que podemos utilizar para simular interações com dependências externas ao que estamos testando de fato (na literatura, é comum referir-se ao sistema sendo testado como SUT , que significa System under Test).
+
+Primeiro, vamos fazer a instalação do Sinon:
+
+    npm install --save-dev sinon
+
+Agora vamos ver na prática como podemos criar um stub para a função de leitura do fs:
+
+    const fs = require('fs');
+    const sinon = require('sinon');
+
+    sinon.stub(fs, 'readFileSync')
+      .returns('Valor a ser retornado');
+
+Perceba que precisamos importar o módulo fs e, então, falamos para o sinon criar um stub para a função readFileSync que retornará 'Valor a ser retornado' , conforme especificamos na chamada para returns.
+
+
+*Stub*
+
+Vamos modificar nosso teste para utilizar o stub:
+
+    const fs = require('fs');
+    const sinon = require('sinon');
+    const { expect } = require('chai');
+
+    const leArquivo = require('./leArquivo');
+
+    const CONTEUDO_DO_ARQUIVO = 'VQV com TDD';
+
+    sinon.stub(fs, 'readFileSync').returns(CONTEUDO_DO_ARQUIVO);
+
+    describe('leArquivo', () => {
+      describe('Quando o arquivo existe', () => {
+        describe('a resposta', () => {
+          const resposta = leArquivo('arquivo.txt');
+
+          it('é uma string', () => {
+            expect(resposta).to.be.a('string');
+          });
+
+          it('é igual ao conteúdo do arquivo', () => {
+            expect(resposta).to.be.equals(CONTEUDO_DO_ARQUIVO);
+          });
+        });
+      });
+
+      describe('Quando o arquivo não existe', () => {
+        it('a resposta é igual a "null"', () => {
+          const resposta = leArquivo('arquivo_que_nao_existe.txt');
+
+          expect(resposta).to.be.equal(null);
+        });
+      });
+    });
+
+Perceba que os testes que esperavam o valor retornados pelo stub funcionaram. Porém, onde o valor esperado era outro, o teste passou a quebrar.
+Isso aconteceu porque criamos um comportamento falso único para a função, que é aplicado para todos os testes. Entretanto, em cada situação é esperado um valor diferente:
+
+    - Quando o arquivo passado existe é esperado que ela retorne o valor;
+    - Quando o arquivo passado não existe é esperado um erro;
+
+Sendo assim, o ideal é sempre criarmos Tests Doubles para o escopo de cada cenário de teste.
+
+O mocha nos fornece duas funções chamadas before e after . Como o nome diz, são funções que serão executadas "antes" e "depois" daquele "bloco" de testes, ou seja, daquele describe. Vamos adicionar ao nosso teste:
+
+    const fs = require('fs');
+    const sinon = require('sinon');
+    const { expect } = require('chai');
+
+    const leArquivo = require('./leArquivo');
+
+    const CONTEUDO_DO_ARQUIVO = 'VQV com TDD';
+
+    describe('leArquivo', () => {
+      describe('Quando o arquivo existe', () => {
+        before(() => {
+          sinon.stub(fs, 'readFileSync').returns(CONTEUDO_DO_ARQUIVO);
+        });
+
+        after(() => {
+          fs.readFileSync.restore();
+        });
+
+        describe('a resposta', () => {
+          it('é uma string', () => {
+            const resposta = leArquivo('arquivo.txt');
+
+            expect(resposta).to.be.a('string');
+          });
+
+          it('é igual ao conteúdo do arquivo', () => {
+            const resposta = leArquivo('arquivo.txt');
+
+            expect(resposta).to.be.equals(CONTEUDO_DO_ARQUIVO);
+          });
+        });
+      });
+
+      describe('Quando o arquivo não existe', () => {
+        before(() => {
+          sinon
+            .stub(fs, 'readFileSync')
+            .throws(new Error('Arquivo não encontrado'));
+        });
+
+        after(() => {
+          fs.readFileSync.restore();
+        });
+
+        describe('a resposta', () => {
+          it('é igual a "null"', () => {
+            const resposta = leArquivo('arquivo_que_nao_existe.txt');
+
+            expect(resposta).to.be.equal(null);
+          });
+        });
+      });
+    });
+
+Perceba que antes de cada cenário de teste nós alteramos o comportamento do método do fs criando um stub e, depois da execução do teste, utilizamos a função restore() que o sinon atribui aos stubs para retornarmos o comportamento padrão daquela função.
