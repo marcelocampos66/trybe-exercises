@@ -29,10 +29,11 @@ app.get('/simpsons/:id', async (req, res) => {
 
 app.post('/simpsons', async (req, res) => {
   const { body: { id , name } } = req;
+  if (!Number(id)) return res.status(410).json({ message: 'invalid id' });
   const characters = await getAllSimpsons();
   const isOnList = characters.some((char) => char.id === id);
   if (isOnList) {
-    res.status(409).json({ message: 'id already exists' });
+    return res.status(409).json({ message: 'id already exists' });
   }
   const newArray = [...characters, { id, name }];
   await registerSimpson(newArray);

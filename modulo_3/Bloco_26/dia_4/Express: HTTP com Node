@@ -294,6 +294,10 @@ Para executar o comando do script:
 
     npm run dev
 
+eslint config trybe:
+
+npm i -D eslint eslint-config-trybe-backend
+
 
 Um detalhe muito importante é que o Express, por si só, não realiza a leitura e interpretação do body das requests . Isso quer dizer que, sem uma "ajudinha", não conseguimos acessar o body da request. Para que essa informação esteja disponível para uso no servidor, é necessário utilizar um middleware como o body-parser . Esse tipo de biblioteca é responsável por ler e interpretar o corpo da request e, normalmente, criar uma chave body dentro do objeto req , contendo o conteúdo do body.
 
