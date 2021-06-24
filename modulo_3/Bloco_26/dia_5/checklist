@@ -1,0 +1,67 @@
+Cria um pacote node
+    
+    npm init
+
+instala o Express
+
+    npm install express
+
+instala o Body Parser
+
+    npm install body-parser
+
+instala o nodemon
+
+    npm install nodemon -D
+
+nos scripts no package.json adicionar:
+
+    "dev": "nodemon <arquivo>"
+    "dev": "nodemon index.js" exemplo
+
+instala o rescue
+
+    npm install express-rescue
+
+para usar o rescue:
+
+    const rescue = require('express-rescue');
+
+    app.get(
+          '/:fileName',
+          rescue(async (req, res) => {
+            const file = await fs.readFile(`./${req.params.fileName}`);
+            res.send(file.toString('utf-8'));
+          })
+        );
+
+para requisicoes a APIs de terceiros, o Axios:
+
+    npm install axios
+
+
+Padrao
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const PORT = 3000;
+
+const app = express();
+
+app.use(bodyParser.json());
+
+// helpers
+
+// 
+
+// Rotas
+
+// 
+
+app.use((err, _req, res, _next) => {
+  res.status(500).json({ message: err.message });
+}); //middleware error
+
+app.listen(PORT, () => { console.log(`Rodando na porta ${PORT}`) });
+
+
