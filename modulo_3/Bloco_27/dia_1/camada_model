@@ -1,0 +1,376 @@
+**Arquitetura MSC**
+
+Podemos definir as três camadas das seguinte forma:
+
+- Camada de Modelo (M): Arquivos onde iremos executar as operações do banco de dados, como criar conexões e executar queries.
+- Camada de Serviço (S): Arquivos onde iremos estruturar nossas regras de negócio, geralmente é quem chama os métodos definidos na camada de modelo.
+- Camada de Controladores (C): Interface mais próxima da pessoa usuária ou de uma requisição, vai processar e chamar as devidas funções da camada de serviço.
+
+Obs.: Algumas vezes a camada de Controller pode se comunicar direto com a camada de modelo, dispensando o uso da camada de serviço, principalmente em situações onde não temos uma regra de negócio tão complexa. Mas cuidado, isso deve ser usado apenas em casos específicos, e uma vez que um endpoint exija o uso de um service, o ideal é que todos os outros também utilizem essa camada, para que a arquitetura seja respeitada e a aplicação não torne-se "bagunçada".
+
+
+**Arquitetura de Software - Camada de Model**
+
+O model é onde nós manipulamos e definimos a estrutura dos nossos dados. Todo acesso aos dados deve passar por essa camada.
+
+Os dados que a aplicação utiliza podem estar armazenados em um banco de dados, acessados através de uma API externa, arquivos ou outros dispositivos de armazenamento.
+
+O model é responsável por abstrair completamente os detalhes de acesso e armazenamento, fornecendo somente uma API que permita requisitar e manipular esses dados. Por exemplo, é responsabilidade da camada de models estabelecer uma conexão com o banco de dados.
+
+É no model que verificaríamos se o novo usuário que estamos tentando criar é válido de acordo com as regras de negócio definidas, ou se a pessoa que está tentando apagar um post tem permissão para tal. Exemplo, temos essse model:
+
+    // userModel.js
+
+    const db = require('./db'); // Arquivo "fictício" que representa a conexão com o banco
+
+    async function getUser (username) {
+        return db.findOne({ username })
+        .then(result => result || null);
+    }
+
+podemos utilizar esse arquivo em qualquer lugar onde precisemos de um usuário:
+
+// cli.js
+
+    const readline = require('readline-sync');
+    const userModel = require('./userModel');
+
+    async function start() {
+        const username = readline.question('Digite seu nome de usuário');
+        const user = await userModel.getUser(username);
+
+        if (!user) {
+            return console.log('Usuário não encontrado');
+        }
+
+        console.log('Aqui estão os dados do usuário:');
+        console.log(user);
+    }
+
+    start();
+
+Dessa forma, caso nossos usuários passem a estar armazenados em outro lugar, como num arquivo, ou num outro banco de dados, nós só precisaremos alterar o arquivo userModel.js.
+
+
+
+*Model com MySQL*
+
+Criando e populando o banco de dados
+
+Em index.js , importamos o express e iniciamos uma nova aplicação. Porém, para que possamos nos comunicar com o MySQL, precisamos de um driver . Um driver é um software que permite que você se comunique com o banco de dados a partir de uma aplicação. Qual driver usar depende tanto da linguagem quanto do banco de dados que você está utilizando. Vamos utilizar o drive chamado mysql2 . Instale-o executando o comando abaixo:
+
+    npm install mysql2
+
+Agora, na raiz do projeto crie uma pasta models e, dentro dela, crie um arquivo connection.js. Lembre-se de substituir os campos user e password pelo usuário e senha que você utiliza para acessar o banco:
+
+    const mysql = require('mysql2/promise');
+
+    const connection = mysql.createPool({
+        host: 'localhost',
+        user: 'root',
+        password: 'senha123',
+        database: 'model_example'});
+
+    module.exports = connection;
+
+Primeiro, importamos o mysql do módulo mysql2/promise , assim utilizamos a versão mais atualizada do mysql2 em vez de usar a versão com callbacks.
+O método createPool cria uma pool de conexões com o banco de dados. Isso significa que a própria biblioteca irá gerenciar as múltiplas conexões que fizermos com o banco. O createPool recebe um objeto com as credenciais necessárias para estabelecer a conexão. Entre as opções possíveis, estão:
+
+    host : local onde o servidor do MySQL está armazenado. Como estamos executando localmente, usamos localhost ;
+    user : usuário que vamos utilizar para acessar o banco. Estamos usando o usuário root nesse exemplo;
+    password : senha do usuário especificado. Coloque '' se não houver senha para o usuário;
+    database : nome do banco ao qual queremos nos conectar;
+
+O método createPool retorna um objeto Pool representando uma sessão com o banco.
+Para não ser necessário criar uma sessão e selecionar o schema sempre que precisarmos acessar o banco, armazenamos nossa pool na variável connection.
+
+
+*Criando o model*
+
+Agora, podemos de fato começar a escrever nossa aplicação. A primeira coisa que faremos é criar uma rota que retornará uma lista com os nomes de todos os autores. Queremos também que seja exibido o nome completo do escritor, que será a concatenação do primeiro nome, nome do meio (se houver) e sobrenome.
+
+A camada de modelo pode ser implementada de várias formas. Aqui, vamos seguir esta abordagem:
+
+- Haverá uma entidade chamada Author na aplicação;
+- A entidade vai conter os campos firstName , middleName e lastName . Note que os nomes estão em camelCase , enquanto as colunas do banco estão em snake_case ;
+- No código, um objeto contendo os campos mencionados acima será utilizado para representar um autor.
+- Existirão funções para ler e criar escritores do banco de dados;
+- A rota só irá interagir com os dados através da interface do model Author.
+
+Dando continuidade à nossa aplicação, crie o arquivo Author.js , dentro da pasta models:
+
+    // models/Author.js
+
+    const connection = require('./connection');
+
+    // Cria uma string com o nome completo do autor
+
+    const getNewAuthor = (authorData) => {
+    const { id, firstName, middleName, lastName } = authorData;
+
+    const fullName = [firstName, middleName, lastName]
+        .filter((name) => name)
+        .join(' ');
+
+    return {
+        id,
+        firstName,
+        middleName,
+        lastName,
+        name: fullName,
+    };
+    };
+
+    // Converte o nome dos campos de snake_case para camelCase
+
+    const convertFields = (authorData) => ({
+        id: authorData.id,
+        firstName: authorData.first_name,
+        middleName: authorData.middle_name,
+        lastName: authorData.last_name});
+
+    // Busca todos os autores do banco.
+
+    const getAll = async () => {
+        const [authors] = await connection.execute(
+            'SELECT id, first_name, middle_name, last_name FROM model_example.authors;',
+        );
+        return authors.map(convertFields).map(getNewAuthor);
+    };
+
+    module.exports = {
+        getAll,
+    };
+
+O model Author exporta uma função getAll . Essa função retornará todos os escritores cadastrados no banco de dados. Utilizamos o método execute para fazer uma query mysql como já estamos acostumados. Esse método retorna uma Promise que quando resolvida, nos fornece um array com 2 campos: [rows, fields] . O primeiro index é onde está a resposta que desejamos (no caso o Authors) e no segundo vêm algumas informações extras sobre a query que não iremos utilizar.
+
+Repare que função getAll faz o mapeamento dos dados do banco para a aplicação, convertendo os nomes de snake_case para camelCase , utilizando a função convertFields . Note também o uso da função getNewAuthor , que formata os dados para que seja exibido o nome completo do autor em uma única string.
+
+Com o model criado devemos então criar a rota que o utilizará. Adicione ao conteúdo do index.js o seguinte:
+
+
+    / index.js
+
+    // const express = require('express');
+
+    // const Author = require('./models/Author');
+
+    // const app = express();
+
+    app.get('/authors', async (_req, res) => {
+        const authors = await Author.getAll();
+
+        res.status(200).json(authors);
+    });
+
+    // const PORT = process.env.PORT || 3000;
+
+    // app.listen(PORT, () => {
+    //  console.log(`Ouvindo a porta ${PORT}`);
+    // });
+
+
+Agora vamos criar um método e um endpoint para obter os detalhes de um escritor. A rota do endpoint é /authors/:id , onde id corresponde ao id do escritor.
+Na model Authors crie o seguinte método:
+
+    const findById = async (id) => {
+    // Repare que substituímos o id por `?` na query.
+    // Depois, ao executá-la, informamos um array com o id para o método `execute`.
+    // O `mysql2` vai realizar, de forma segura, a substituição do `?` pelo id informado.
+    const query = 'SELECT first_name, middle_name, last_name FROM model_example.authors WHERE id = ?'
+    const [ authorData ] = await connection.execute(query, [id]);
+
+    if (!authorData) return null;
+
+    // Utilizamos [0] para buscar a primeira linha, que deve ser a única no array de resultados, pois estamos buscando por ID.
+    const { firstName, middleName, lastName } = convertFields(authorData[0]);
+
+    return getNewAuthor({
+        id,
+        firstName,
+        middleName,
+        lastName});
+    };
+
+No index.js adicionamos a rota:
+
+    app.get('/authors/:id', async (req, res) => {
+      const { id } = req.params;
+
+      const author = await Author.findById(id);
+
+      if (!author) return res.status(404).json({ message: 'Not found' });
+
+      res.status(200).json(author);
+    });
+
+Agora vamos incrementar nossa aplicação para permitir a criação de novos escritores.
+Primeiro, vamos adicionar dois métodos no nosso model Authors:
+
+    const isValid = (firstName, middleName, lastName) => {
+        if (!firstName || typeof firstName !== 'string') return false;
+        if (!lastName || typeof lastName !== 'string') return false;
+        if (middleName && typeof middleName !== 'string') return false;
+
+        return true;
+    };
+
+    const create = async (firstName, middleName, lastName) => connection.execute(
+        'INSERT INTO model_example.authors (first_name, middle_name, last_name) VALUES (?,?,?)',
+        [firstName, middleName, lastName],
+    );
+
+isValid é uma função que retorna um boolean indicando se os dados são válidos, checando se firstName e lastName são strings não vazias, e se middleName , caso seja informado, é uma string. create é uma função que recebe firstName, middleName e lastName e salva um autor no banco.
+
+Como agora teremos requisições POST, precisaremos fazer o parsing do corpo da requisição. O middleware body-parser é capaz de fazer isso automaticamente para nós.
+
+Criamos entao nossa rota POST:
+
+    app.post('/authors', async (req, res) => {
+        const { first_name, middle_name, last_name } = req.body;
+
+        if (!Author.isValid(first_name, middle_name, last_name)) {
+            return res.status(400).json({ message: 'Dados inválidos' });
+        }
+
+        await Author.create(first_name, middle_name, last_name);
+
+        res.status(201).json({ message: 'Autor criado com sucesso! '});
+    });
+
+A rota POST /authors extrai as informações do autor que chegam em req.body e verifica se os dados enviados são válidos. Caso não sejam, o endpoint retorna um JSON com uma mensagem informando o que houve, juntamente como o status 400 , que indica uma requisição ruim, no caso com dados inválidos. Caso os dados sejam válidos, pede ao modelo para criar um novo escritor e retorna um JSON com uma mensagem indicando que o autor foi criado com sucesso.
+
+
+*Model com MongoDB*
+
+Como dissemos anteriormente, uma das maiores vantagens que a camada de model nos traz é que, independentemente de como os dados são armazenados, a representação e as responsabilidades do modelo não mudam.
+
+A aplicação que construímos na seção anterior utilizava MySQL como data storage . Nessa seção, vamos trocar o MySQL pelo MongoDB. Isso servirá a dois propósitos: mostrar como acessar o MongoDB a partir de aplicações Node.js e exemplificar como é possível trocar nosso data storage com algumas poucas alterações na camada de model , sem afetar as demais.
+
+
+Criando uma conexão com o banco
+
+Assim como ocorreu com o MySQL, precisamos de um driver para acessar o MongoDB pelo Node.js. Vamos instalar o driver oficial:
+
+    npm install mongodb
+
+Agora vamos estabelecer uma conexão com o servidor do MongoDB rodando localmente. O arquivo connection tera o código abaixo:
+
+    // models/connection.js
+
+    const { MongoClient } = require('mongodb');
+
+    const OPTIONS = {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    }
+
+    const MONGO_DB_URL = 'mongodb://127.0.0.1:27017';
+
+    let db = null;
+
+    const connection = () => {
+        return db
+        ? Promise.resolve(db)
+        : MongoClient.connect(MONGO_DB_URL, OPTIONS)
+        .then((conn) => {
+        db = conn.db('model_example');
+        return db;
+        })
+    };
+
+    module.exports = connection;
+
+Connection do video:
+
+    const connection = () => {
+        return MongoClient.connect(MONGO_DB_URL, OPTIONS)
+            .then((conn) => conn.db('nomeDoBanco'))
+            .catch((err) => {
+                console.error(err);
+                process.exit();
+            });
+    }
+
+Note o uso dos parâmetros useNewUrlParser e useUnifiedTopology . Eles dizem ao driver do mongodb como ele deve se conectar ao banco:
+
+    useNewUrlParser : o time do mongodb reescreveu a forma que o driver utiliza para interpretar a URL de conexão ao banco. Por ser uma mudança muito grande, essa nova forma de interpretação de URLs só é ativada com o uso dessa flag. A forma antiga, no entanto, está depreciada, e seu uso emite um warning no terminal.
+
+    useUnifiedTopology : nas versões mais recentes do driver do mongodb, a ferramenta que realiza a descoberta de servidores e a conexão com os mesmos foi alterada. Essa flag diz para o driver do mongodb que queremos utilizar essa nova forma de conexão. A forma de conexão antiga está depreciada, e seu uso emite um warning no terminal.
+
+
+Outro ponto importante de se reparar no código acima é que estamos utilizando um padrão conhecido como singleton . Em resumo, um singleton é um objeto ou módulo que, mesmo que chamado várias vezes, só vai ser criado uma vez.
+No nosso caso, da primeira vez que chamarmos a função connection , a variável db estará vazia, e precisaremos realizar a conexão com o banco.
+No entanto, nas próximas vezes, a variável já estará preenchida, pois nós a preenchemos na linha 14, da primeira vez que realizamos a condição.
+Sendo assim, a execução não chega no MongoClient.connect . Ela é interrompida antes e a db armazenada anteriormente é retornada.
+Isso garante que, durante todo o ciclo de vida da nossa aplicação, só iremos abrir uma conexão com o banco. Isso que estamos fazendo é semelhante ao que fazemos ao criar uma pool no mysql2 . A questão é que o método de conexão do driver do MongoDB retorna uma Promise e, por isso, é mais difícil utilzá-lo exatamente da mesma forma.
+O importante é que você entenda que estamos tranbalhando com um pool de conexões , da mesma forma que no mysql2 ;
+Agora vamos ver como podemos utilizar essa conexão.
+
+
+Listando os escritores no MongoDB
+
+Metodo para trazer todos os escritores:
+
+    const getAll = async () => {
+        return connection()
+            .then((db) => db.collection('authors').find().toArray())
+                .then((authors) =>
+                    authors.map(({ _id, firstName, middleName, lastName }) =>
+                    getNewAuthor({
+                        id: _id,
+                        firstName,
+                        middleName,
+                        lastName,
+                    })
+                )
+            );
+    }
+
+O método getAll continua funcionando de forma parecida. Ela busca no banco todos os escritores, faz um mapeamento para o formato de objeto que definimos para Author e retorna uma Promise . A diferença é que, como agora estamos usando o MongoDB , mudamos a forma de recuperar os dados. Note que mudamos id para _id , e que mudamos o destructure utilizado no authors.map para utilizar um destructure de objeto, ao invés de um destructure de array. Fizemos isso porque o MongoDB não nos devolve um Array de colunas como o MySQL , e sim um objeto para cada documento encontrado.
+
+A API que o pacote mongodb oferece é bem semelhante à que usamos no cliente do MongoDB, com pequenas mudanças. Em vez de fazer db.authors.find() , por exemplo, precisamos fazer db.collection('authors').find() . Além de find , você pode utilizar outros métodos conhecidos, como findOne , insertMany e updateMany.
+
+
+Obtendo detalhes de um escritor
+
+Modificando a funcao findById:
+OBS: Note que precisamos importar também o ObjectId do mongodb na primeira linha do arquivo.
+
+
+/ models/Authors.js
+
+const { ObjectId } = require('mongodb');
+
+// const connection = require('./connection');
+
+// ...
+
+// Busca um autor específico, a partir do seu ID
+// @param {String} id ID do autor a ser recuperado
+
+const findById = async (id) => {
+    if (!ObjectId.isValid(id)) {
+        return null;
+    }
+
+    const authorData = await connection()
+        .then((db) => db.collection('authors').findOne(new ObjectId(id)));
+
+    if (!authorData) return null;
+
+    const { firstName, middleName, lastName } = authorData;
+
+    return getNewAuthor({ id, firstName, middleName, lastName });
+};
+
+Aqui usamos findOne(new ObjectId(id)) , uma sintaxe mais sucinta que podemos empregar quando estamos filtrando documentos pelo campo _id . Também poderíamos usar a versão completa e mais verbosa: findOne({ _id: new ObjectId(id) }).
+
+
+Criando um novo escritor
+
+const create = async (firstName, middleName, lastName) =>
+    connection()
+        .then((db) => db.collection('authors').insertOne({ firstName, middleName, lastName }))
+        .then(result => getNewAuthor({ id: result.insertedId, firstName, middleName, lastName }));
+
