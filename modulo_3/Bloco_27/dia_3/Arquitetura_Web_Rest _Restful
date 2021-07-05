@@ -1,0 +1,239 @@
+*REST*
+
+Representational State Transfer (REST), em português Transferência de Estado Representacional, é um estilo de arquitetura de software, controlado pelo W3C , que define um conjunto de restrições a serem usadas para a criação de APIs.
+
+O REST deve ser visto como um conjunto de boas práticas. Quando você está construindo uma API, existem algumas normas que você deve seguir para ser "educado" (RESTful).
+
+Para o REST, uma aplicação é um conjunto de recursos que podem ter seu estado representado de alguma forma. Ao consumir esses recursos, você está transferindo as informações sobre esse estado para o cliente (uma requisição GET , por exemplo) ou fazendo uma alteração nele (um POST , PUT ou DELETE ). Daí o nome Transferência de Estado Representacional , ou seja, estamos transferindo uma representação do estado de algum recurso.
+
+
+*Mas o que é um Recurso, afinal?*
+
+Um recurso, em REST, é uma abstração da informação. Dito isso, qualquer coisa que possa ser nomeada pode ser um recurso. Por exemplo:
+
+- Usuários;
+- Produtos;
+- Compras;
+- Etc.
+
+Todos os exemplos acima podem ser considerados recursos.
+No universo de Star Wars existem vários planetas. Na SWAPI , podemos chamar um endpoint para listar todos os planetas ou apenas um. Nesse caso, um planeta é um recurso , e planetas é uma coleção de recursos.
+
+
+*As 6 restrições para ser RESTful*
+
+A arquitetura REST define seis restrições, chamadas constraints , que devem ser respeitadas para que sua API seja RESTful.
+
+
+**1 - Interface uniforme ( Uniform Interface )**
+
+*Recursos e coleções*
+O recurso a ser acessado/alterado deve ser identificado pelo endpoint da requisição. Exemplo: https://swapi.dev/api/planets/:id . Nessa URL, vemos que o recurso que queremos acessar, planet , é facilmente identificado.
+Usar plural ou singular? Não importa. O importante é manter o padrão.
+
+*Tipo do retorno*
+Talvez você já tenha visto um header chamado Content-type nas respostas de requisições. Ele serve para dizer, para o nosso cliente, que tipo de conteúdo estamos retornando.
+Se estamos retornando um JSON, enviamos o header como Content-type: application/json . Se fosse HTML, seria Content-type: text/html , e por aí vai.
+Alguns formatos comuns são JSON , XML e JavaScript .
+Esse tópico é, literalmente, sobre manter esses retornos consistentes. Se o cliente pede ou envia informação no formato JSON, você deve processar e retornar mantendo o formato JSON. Se um erro em um endpoint retorna os campos code , error e message , todos os erros devem retornar, pelo menos, esses campos. Se uma requisição ao endpoint de uma coleção ( GET /posts , por exemplo), retorna um Array, todos os endpoints de coleção devem retornar Arrays. Se, por exemplo, quando realizamos uma requisição GET /products , recebemos um array de produtos, ao realizar a requisição GET /sales , não devemos receber um JSON no formato { "sales": [{ ... }] } , já que esse comportamento é inconsistente com o do endpoint GET /products .
+Dessa forma, ao consumir um endpoint da sua API, é possível até mesmo deduzir o comportamento dos demais endpoints, dispensando "tentativa e erro".
+
+*Ações/Verbos*
+A ação que vamos realizar no recurso deve ser identificada pelo verbo HTTP da requisição. Para o REST, os principais verbos HTTP são POST , GET , PUT e DELETE , e cada um realiza uma ação, dependendo se for enviado para o endpoint de um recurso ou de uma coleção.
+
+    POST - CRIA - Status 201
+    GET - LE - Status 200
+    PUT - UPDATE - Status 200
+    DELETE - DELETA - Status 204 No content
+
+*Respostas*
+Respostas são sempre obrigatórias. Nunca deixe seu cliente sem resposta, mesmo que ela não tenha um corpo.
+Existem boas práticas em relação aos status code que nosso servidor envia como resposta. Temos uma variedade de códigos que devemos utilizar em situações específicas:
+
+    1xx: Informação;
+    2xx: Sucesso;
+    3xx: Redirecionamento;
+    4xx: Erro do cliente;
+    5xx: Erro no servidor.
+
+
+**2 - Arquitetura cliente-servidor**
+
+Você já ouviu falar muito de arquitetura cliente-servidor, não é? De termos uma API e um cliente desacoplados? É exatamente o que o REST prega.
+
+Não importa quem é nosso cliente, as nossas APIs têm que conseguir retornar dados para ele. O cliente pode ser um app mobile, web, tv, arduíno etc.
+
+Lembra-se dos projetos que você fez no módulo de front-end, em que você consumia APIs externas, como a SWAPI ? Então, você poderia facilmente mudar as APIs com que esses projetos se comunicam para outras, desde que os contratos (os endpoints, os formatos das requisições, o que é retornado etc.) sejam mantidos.
+Imagine como seria se o Mercado Livre não tivesse um padrão na API deles. Seria um caos para conseguir integrar no front-end que estávamos construindo.
+
+O princípio básico aqui é a separação de responsabilidades em duas partes. O cliente se preocupa com a exibição dos dados, experiência do usuário etc. O servidor se preocupa com armazenamento e acesso dos dados, cache, log e por aí vai.
+
+Isso permite que as duas partes se desenvolvam de forma independente. Você pode trocar o cliente ou adicionar um novo sem mudar nada no servidor. Você pode mover o servidor para uma outra plataforma, escalá-lo etc. Pode até mesmo mudar completamente sua arquitetura interna, desde que a API que você fornece para seus clientes não mude (endpoint, resposta etc.).
+
+
+**3 - Sem estado ( Stateless )**
+
+Essa constraint é um pouco mais complicada, mas nós temos um bom exemplo no React! Lembra-se quando criamos componentes que não tinham estado, e apenas recebiam props?
+
+Esse é um dos conceitos mais importantes do REST. Ele que vai tornar possível nossa API responder a múltiplos clientes.
+
+Não manter estado significa que toda requisição deve conter todas as informações necessárias (ser autossuficiente) para nossa API realizar uma ação . Desse jeito, não podemos reutilizar nenhum contexto que está armazenado no servidor (uma variável, por exemplo). Exemplo:
+
+Em um app em que você faz uma requisição para se logar, o servidor inicia sua sessão e te retorna um token.
+Na próxima requisição, você precisa enviar o token novamente, pois o servidor "não se lembra" de você.
+
+Esse ponto é importante, pois nos dá alguns benefícios:
+Transparência : facilita o trabalho do lado do servidor, pois todas as informações necessárias já estão na requisição;
+Escalabilidade : sem precisar manter estado, nosso servidor pode desalocar recursos que foram alocados para realizar uma ação específica e alocá-los apenas quando necessário.
+
+
+**4 - Cacheable**
+
+Primeiro, precisamos saber o que é cache . Cache é simplesmente um "depósito de informações". O exemplo mais próximo disso é quando seu navegador armazena imagens e arquivos para não precisar pedi-los para o servidor novamente toda vez que você revisitar uma página.
+Esse cache é feito no lado do cliente, no browser.
+O princípio aqui é que as respostas dadas pela nossa API devem dizer, explicitamente, se podem ou não ser cacheadas e por quanto tempo . Com isso, evita-se que clientes forneçam respostas "velhas" ou inapropriadas.
+Vale ressaltar que o cache deve ser usado sabiamente. Usá-lo demais faz sua API perder a confiabilidade, e usá-lo de menos pode sobrecarregar seu servidor desnecessariamente.
+
+Uma camada de cache bem gerenciada pode reduzir ou eliminar iterações do lado do cliente, aumentando a escalabilidade e a performance da nossa API.
+
+No HTTP, o cache é definido pelo header Cache-Control: max-age=120 . Nesse caso, o cliente "cacheia" a resposta da requisição por 120 segundos. Durante esse tempo, o cliente fornecerá a resposta cacheada, sem precisar consultar o servidor.
+
+
+**5 - Sistema em camadas ( Layered System )**
+
+No caso do REST, essa divisão em camadas não tem nada a ver com a organização do nosso código diretamente. Esse princípio é sobre abstrair do cliente as camadas necessárias para responder a uma requisição .
+Não importa se voce tem uma "API A" que se comunica com a "API B" que se comunica com uma fila ou um arquivo num "local C", ou se consulta um banco de dados, ou se esse banco de dados é local ou está armazenado em outro lugar. Quem consome a API não precisa saber de onde essas coisas estão vindo. Só precisa receber a resposta esperada.
+
+
+**6 - Código sob demanda ( Code on Demand )**
+
+Esse princípio consiste em dar a possibilidade de o nosso servidor enviar código (JavaScript, por exemplo) ao nosso cliente, onde será executado. Assim, você consegue customizar o comportamento do cliente.
+Um exemplo prático: enviar um "widget" para colocar na página um chat para que o cliente possa conversar com alguém.
+Você não precisa implementar código sob demanda para ser RESTful, logo esse item é considerado opcional.
+
+
+**Consumindo APIs**
+
+Enviando um token via header. Exemplo:
+
+    // Armazenamos o token numa variável.
+    // Num ambiente real, esse valor viria do Local Storage, ou de uma variável de ambiente
+    const API_TOKEN = '2d635ea9b637ea0f27d58985cc161d64';
+
+    // Criamos um novo objeto de Headers
+    const headers = new fetch.Headers({
+      Authorization: API_TOKEN});
+
+    // // Para aquecer, vamos começar com uma requisição do tipo `GET`
+    // Passamos o objeto de headers como parâmetro para o fetch
+    fetch('https://postman-echo.com/get?param1=teste', {headers})
+
+resposta:
+
+    {
+      args: { param1: 'teste' },
+      headers: {
+        'x-forwarded-proto': 'https',
+        'x-forwarded-port': '443',
+        host: 'postman-echo.com',
+        'x-amzn-trace-id': 'Root=1-60481786-09532220660034a96956e705',
+        authorization: '2d635ea9b637ea0f27d58985cc161d64',
+        accept: '*/*',
+        'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+        'accept-encoding': 'gzip,deflate'
+      },
+      url: 'https://postman-echo.com/get?param1=teste'
+    }
+
+Nosso token aparece na chave authorization dentro dos headers.
+
+*Utilizando outros verbos HTTP*
+
+Agora que vimos como utilizar headers, vamos ver o que precisamos fazer para utilizar um verbo HTTP diferente.
+
+POST:
+
+    // // Passamos o objeto de headers como parâmetro para o fetch
+    fetch('https://postman-echo.com/post?param1=teste', {method: 'POST'});
+
+resposta:
+
+    {
+      args: { param1: 'teste' },
+      data: {},
+      files: {},
+      form: {},
+      headers: {
+        'x-forwarded-proto': 'https',
+        'x-forwarded-port': '443',
+        host: 'postman-echo.com',
+        'x-amzn-trace-id': 'Root=1-60481884-5a7755d35f884dad157968d7',
+        'content-length': '0',
+        authorization: '2d635ea9b637ea0f27d58985cc161d64',
+        accept: '*/*',
+        'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+        'accept-encoding': 'gzip,deflate'
+      },
+      json: null,
+      url: 'https://postman-echo.com/post?param1=teste'
+    }
+
+Note que, dessa vez, temos mais propriedades além de args : data , files , form e json também estão presentes. Estão todas vazias pois não enviamos nada do tipo para a API ainda.
+
+*Enviando um Body*
+
+Você vai ver agora como enviar informações no corpo da requisição. Para isso, é importante lembrar que o tipo de conteúdo de uma request é determinado pelo header Content-Type . Por isso, além de fornecer o conteúdo que o fetch deve enviar, precisamos também configurar esse header. Exemplo:
+
+    const API_TOKEN = '2d635ea9b637ea0f27d58985cc161d64';
+
+    // Precisamos adicionar o header `Content-Type` e defini-lo como `application/json`
+
+    const headers = new fetch.Headers({
+      Authorization: API_TOKEN,
+      'Content-Type': 'application/json',
+    });
+
+    // Depois, criamos o body
+    // Utilizamos o `stringify` para que possamos enviar esse body como JSON
+
+    const body = JSON.stringify({
+      name: 'Tryber',
+      email: 'tryber@betrybe.com',
+      password: 'Tr1b3r'});
+
+Adicionamos o body às opções da request:
+
+    fetch('https://postman-echo.com/post?param1=teste', {
+        headers,
+        method: 'POST',
+        body,
+    });
+
+O resultado eh o seguinte:
+
+    {
+      args: { param1: 'teste' },
+      data: { name: 'Tryber', email: 'tryber@betrybe.com', password: 'Tr1b3r' },
+      files: {},
+      form: {},
+      headers: {
+        'x-forwarded-proto': 'https',
+        'x-forwarded-port': '443',
+        host: 'postman-echo.com',
+        'x-amzn-trace-id': 'Root=1-60481a4f-6fe65f3d723405ca6c6c7536',
+        'content-length': '66',
+        authorization: '2d635ea9b637ea0f27d58985cc161d64',
+        'content-type': 'application/json',
+        accept: '*/*',
+        'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+        'accept-encoding': 'gzip,deflate'
+      },
+      json: { name: 'Tryber', email: 'tryber@betrybe.com', password: 'Tr1b3r' },
+      url: 'https://postman-echo.com/post?param1=teste'
+    }
+
+
+Dessa vez, a API nos envia de volta um objeto na propriedade data , e o mesmo objeto na propriedade json , o que quer dizer que o corpo da mensagem foi lido e interpretado com sucesso!
+Para utilizar outros verbos HTTP, basta alterar o valor da propriedade method , informando o método desejado, e pronto!
+
+Pra finalizar, fica o lembrete: Aqui utilizamos o node-fetch e o Node.js para executar os exemplos no terminal, mas o código acima utiliza o fetch, que é compatível com o fetch do navegador. Isso quer dizer que você pode utilizar esse conhecimento para realizar requests no front também, quando estiver integrando front-end e back-end.
